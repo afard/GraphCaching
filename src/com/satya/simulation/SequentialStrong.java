@@ -3,7 +3,7 @@ package com.satya.simulation;
  * @author Satya
  * This is the program for Sequential Strong Simulation.
  */
-// Code available in GIT
+//********** Code available in GIT **********
 import com.satya.graph.common.Ball;
 import com.satya.graph.common.Graph;
 import com.satya.graph.common.Utils;
