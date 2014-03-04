@@ -1,3 +1,5 @@
+This is the README file for our Graph Caching project
+
 A. SEQUENTIAL DUAL: Runs fine. No Errors.
 
 How to run: 
