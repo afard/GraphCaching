@@ -1,11 +1,11 @@
-package com.satya.simulation;
+package graph.simulation;
 /*
  * For experiments with any java stuff
  */
 
-import com.satya.graph.common.Ball;
-import com.satya.graph.common.Graph;
-import com.satya.graph.common.Utils;
+import graph.common.Ball;
+import graph.common.Graph;
+import graph.common.Utils;
 
 import java.util.Arrays;
 import java.util.Collections;

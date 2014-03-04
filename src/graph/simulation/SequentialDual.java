@@ -6,17 +6,17 @@
  *
  */
 // *************Code available in Git*********//test
-package com.satya.simulation;
+package graph.simulation;
 
 //import gps.examples.gm.gpsPageRank.gpsPageRank.gpsPageRankVertex;
+import graph.common.Graph;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.satya.graph.common.Graph;
 
 /*****************************************************************
  * Runs the sequential dual simulation on the ball

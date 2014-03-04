@@ -1,13 +1,13 @@
-package com.satya.simulation;
+package graph.simulation;
+
+import graph.common.Ball;
+import graph.common.Graph;
+import graph.common.GraphMetrics;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import com.satya.graph.common.Ball;
-import com.satya.graph.common.Graph;
-import com.satya.graph.common.GraphMetrics;
 
 public class TightSimExperiment {
 	

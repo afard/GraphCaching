@@ -1,4 +1,4 @@
-package com.satya.graph.common;
+package graph.common;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;

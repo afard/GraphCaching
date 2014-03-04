@@ -4,7 +4,7 @@
  *  @see LICENSE (MIT style license file).
  *  @see http://cobweb.cs.uga.edu/~jam/scalation_1.1/src/main/scala/scalation/graphalytics/GraphMetrics.scala
  */
-package com.satya.graph.common;
+package graph.common;
 
 import java.io.*;
 
