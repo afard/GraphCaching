@@ -144,8 +144,8 @@ public class SequentialTight {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Graph g = new Graph("/Users/Satya/Desktop/G.txt");
-		Graph q = new Graph("/Users/Satya/Desktop/Q.txt");
+		Graph g = new Graph("exampleGraphs/G_tight1.txt");
+		Graph q = new Graph("exampleGraphs/Q_tight1.txt");
 		System.out.println("Started SEQUENTIAL TIGHT:.....");
 		
 		long tightStart = System.nanoTime();

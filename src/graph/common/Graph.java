@@ -17,7 +17,7 @@ import java.util.Set;
 
 import static java.lang.System.out;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 /** This class holds any graph in a 2D array. Named as Graph since this will be used for query graphs in GPS
  *  @author Usman Nisar, Arash Fard
@@ -32,7 +32,7 @@ public class Graph {
 	 */
 	public int[][] vertices = null;
 	public int[] allIds = null;
-	private static Logger logger = Logger.getLogger(Graph.class);
+//	private static Logger logger = Logger.getLogger(Graph.class);
 	private int diameter = -1;
 	private int radius = -1;
 	public Map<Integer, Set<Integer>> labelIndex = null;
@@ -107,11 +107,13 @@ public class Graph {
 			//Close the input stream
 			in.close();
 
-			logger.info("Successfully read the query graph");
+//			logger.info("Successfully read the query graph");
+			System.out.println("Successfully read the query graph");
 
 		} // try
 		catch (Exception e) {//Catch exception if any
-			logger.error("Error: " + e.getMessage());
+//			logger.error("Error: " + e.getMessage());
+			System.out.println("Error: " + e.getMessage());
 		} //catch
 	}
 
@@ -268,7 +270,8 @@ public class Graph {
 		try {
 			return vertices[id][0];
 		} catch (java.lang.NullPointerException ex) {
-			logger.error("For the id " + id);
+//			logger.error("For the id " + id);
+			System.out.println("For the id " + id);
 			return -1;
 		}
 	}
