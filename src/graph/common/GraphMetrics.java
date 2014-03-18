@@ -6,9 +6,8 @@
  */
 package graph.common;
 
-import java.io.*;
 
-//import org.apache.log4j.Logger;
+
 
 import java.util.Queue;
 import java.util.LinkedList;
@@ -27,7 +26,6 @@ public class GraphMetrics {
     private int[] len         = null;       // path-length from vertex i to j
     public int[][] eccentricity = null;    // eccentricity of the vertices
     private List<Set<Integer>> undirectedG = null; // corresponding undirected graph
-//    private static Logger logger = Logger.getLogger(GraphMetrics.class);
 
     /*************************************************************
      * Default constructor for the class
@@ -35,7 +33,6 @@ public class GraphMetrics {
      */
     public GraphMetrics(int[][] theGraph) {
         if(theGraph == null)
-//            logger.error("Error: GraphMetrics object can not be created for a null graph");
         System.out.println("Error: GraphMetrics object can not be created for a null graph");
         vertices = theGraph;
         n = vertices.length;
@@ -62,7 +59,6 @@ public class GraphMetrics {
         for(int i = 0; i < n ; i++) {
             for(int j = 1; j < vertices[i].length; j++) { // the first int is the lable
                 if(vertices[i][j] >= n) {
-//                    logger.error("Error: the input graph structure is not complete");
                     System.out.println("Error: the input graph structure is not complete");
                 }
                 undirectedG.get(i).add(vertices[i][j]);
@@ -111,7 +107,6 @@ public class GraphMetrics {
 
     public int ecc(int id) {
         if(id > n-1 || id < 0) {
-//            logger.error("Error in GraphMetrics: id out of bound");
             System.out.println("Error in GraphMetrics: id out of bound");
             return -1;
         }
