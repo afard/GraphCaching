@@ -144,8 +144,8 @@ public class SequentialDual{
 		public static void main (String[] args) {
 			
 			
-			Graph g = new Graph("/Users/Satya/Desktop/sample-data-graph-final.txt");
-			Graph q = new Graph("/Users/Satya/Desktop/sample-query-graph-final.txt");
+			Graph g = new Graph("exampleGraphs/G1.txt");
+			Graph q = new Graph("exampleGraphs/Q1.txt");
 			g.getAllIds();
 			q.getAllIds();
 			SequentialDual sim = new SequentialDual();		

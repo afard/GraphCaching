@@ -5,6 +5,5 @@
 	<classpathentry kind="lib" path="/Users/Satya/gps-final/trunk/libs/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="/Users/Satya/gps-final/trunk/libs/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="/Users/Satya/gps-final/trunk/libs/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="/Users/Satya/Downloads/javatuples-1.2/lib/javatuples-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

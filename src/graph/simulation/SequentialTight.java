@@ -673,8 +673,8 @@ public class SequentialTight {
 
 	public static void main(String[] args) {
 
-		Graph g = new Graph("/Users/Satya/Desktop/datagraph.txt");
-		Graph q = new Graph("/Users/Satya/Desktop/query.txt");
+		Graph g = new Graph("exampleGraphs/G_tight1.txt");
+		Graph q = new Graph("exampleGraphs/Q_tight1.txt");
 		System.out.println("Started SEQUENTIAL TIGHT:.....");
 
 		long tightStart = System.nanoTime();

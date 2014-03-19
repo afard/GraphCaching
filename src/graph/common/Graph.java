@@ -5,19 +5,12 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.Set;
 
 import static java.lang.System.out;
-
-//import org.apache.log4j.Logger;
 
 /** This class holds any graph in a 2D array. Named as Graph since this will be used for query graphs in GPS
  *  @author Usman Nisar, Arash Fard
@@ -32,7 +25,7 @@ public class Graph {
 	 */
 	public int[][] vertices = null;
 	public int[] allIds = null;
-	//private static Logger logger = Logger.getLogger(Graph.class);
+	
 	private int diameter = -1;
 	private int radius = -1;
 	public Map<Integer, Set<Integer>> labelIndex = null;
@@ -107,11 +100,11 @@ public class Graph {
 			//Close the input stream
 			in.close();
 
-			//logger.info("Successfully read the query graph");
+			
 
 		} // try
 		catch (Exception e) {//Catch exception if any
-			//logger.error("Error: " + e.getMessage());
+			
 		} //catch
 	}
 
@@ -125,7 +118,7 @@ public class Graph {
 			int[] allIds = getAllIds();
 			for (int i = 0; i < allIds.length; i++) {
 				if (labelIndex.get(getLabel(allIds[i])) == null) {
-					Set<Integer> vSet = new HashSet();
+					Set<Integer> vSet = new HashSet<Integer>();
 					vSet.add(allIds[i]);
 					labelIndex.put(getLabel(allIds[i]), vSet);
 				} else {
@@ -208,58 +201,6 @@ public class Graph {
 		return grM.diam();                
 	} // getDiameter
 	/*************************************************************
-	 * Calculates the diameter of the graph using Floyd Warshall algorithm
-	 * @return int The diameter of the undirected graph, -1 if error
-	 */
-	/*    public int getDiameter() {
-        if (this.diameter != -1)
-            return this.diameter;
-
-        int n = vertices.length;
-        int[][] d = new int[n][n];
-
-        // initialize the 2D array with 0
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                d[i][j] = 0;
-            }
-        }
-
-        // populate the matrix with edges for undirected graph
-        for (int i = 0; i < n; i++) {
-            for (int j = 1; j < vertices[i].length; j++) {
-                d[i][vertices[i][j]] = 1;
-                d[vertices[i][j]][i] = 1;
-            }
-        }
-
-        // Floyd Warshall
-        for (int k = 0; k < n; k++) {
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    if ((d[i][k] * d[k][j] != 0) && (i != j)) {
-                        if ((d[i][k] + d[k][j] < d[i][j]) || (d[i][j] == 0)) {
-                            d[i][j] = d[i][k] + d[k][j];
-                        }
-                    }
-                }
-            }
-        }
-
-        // Calculate the longest of all the shortest paths
-        int max = -1;
-        for (int i = 0; i < n; i++) {
-            for (int j = 1; j < n; j++) {
-                if (d[i][j] > max) {
-                    max = d[i][j];
-                }
-            }
-        }
-        this.diameter = max;
-        return this.diameter;
-    }
-	 */
-	/*************************************************************
 	 * Gets the label of the vertex
 	 * @param id Id of the vertex
 	 * @return int Label of the vertex, -1 if not present
@@ -268,7 +209,7 @@ public class Graph {
 		try {
 			return vertices[id][0];
 		} catch (java.lang.NullPointerException ex) {
-			//logger.error("For the id " + id);
+			
 			return -1;
 		}
 	}
@@ -279,7 +220,7 @@ public class Graph {
 	public Map<Integer, Integer> getLabelMap() {
 
 		Map<Integer,Integer> labelMap = new HashMap<Integer,Integer>();
-		//System.out.println(vertices.length);
+		
 		for(int i=0;i<vertices.length;i++){
 			if (vertices[i] != null) {
 				labelMap.put(i, vertices[i][0]);
