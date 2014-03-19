@@ -50,7 +50,7 @@ public class DualSimulation{
 		boolean flag = true;
 		int var=-1;
 
-		// run the dual simulation algorithm
+		// runs the dual simulation algorithm
 		while (flag) {
 			flag = false;
 			for ( int u = 0 ; u < query.getNumVertices() ; u++ ) {
@@ -108,8 +108,8 @@ public class DualSimulation{
 	public static void main (String[] args) {
 
 
-		Graph g = new Graph("/Users/Satya/Desktop/G.txt");
-		Graph q = new Graph("/Users/Satya/Desktop/Q.txt");
+		Graph g = new Graph("/Users/Satya/Desktop/datagraph.txt");
+		Graph q = new Graph("/Users/Satya/Desktop/query.txt");
 		//			g.getAllIds();
 		q.getAllIds();
 		DualSimulation sim = new DualSimulation();		

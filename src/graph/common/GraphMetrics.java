@@ -115,7 +115,8 @@ public class GraphMetrics {
         return eccentricity[id][0];
     } // ecc
 
-    /** Compute the diameter of the graph (longest shortest path and maximum
+    /*********************************************************************************** 
+     * Compute the diameter of the graph (longest shortest path and maximum
      *  eccentricity).
      */
     public int diam() {
@@ -128,7 +129,8 @@ public class GraphMetrics {
     } // diam
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the radius of the graph (minimum eccentricity).
+    /************************************************************************************ 
+     * Compute the radius of the graph (minimum eccentricity).
      */
     public int rad() {
         int min = eccentricity[0][0]; // assuming it is not -1
@@ -140,51 +142,27 @@ public class GraphMetrics {
     } // rad
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the central vertices, those with eccentricities equal to the radius.
+    /*************************************************************************************
+     * Return the central vertices, those with eccentricities equal to the radius.
      */
-//    public Set<Integer> central() {
-//        Set<Integer> centers = new HashSet<Integer>();
-//        int[] ecc_v = new int[n];
-//        for(int i = 0;i<n;i++){
-//        	ecc_v[i] = ecc(i);
-//        }
-//        int radius = ecc(0);
-//        for(int i = 1; i < n; i++) 
-//            if(ecc_v[i]< radius){
-//            	radius = ecc_v[i];
-//            }
-//        for(int i = 0; i < n; i++){
-//        	if(ecc_v[i]==radius);
-//        	centers.add(i);
-//        		
-//        }
-//        return centers;
-//    } // central
-    
- public Set<Integer> central() {
+    public Set<Integer> central() {
         Set<Integer> centers = new HashSet<Integer>();
-        int radius = rad();
-        for(int i = 0; i < n; i++) 
-            if(eccentricity[i][0] == radius) centers.add(i);
+        int[] ecc_v = new int[n];
+        for(int i = 0;i<n;i++){
+        	ecc_v[i] = ecc(i);
+        }
+        int radius = ecc(0);
+        for(int i = 1; i < n; i++) 
+            if(ecc_v[i]< radius){
+            	radius = ecc_v[i];
+            }
+        for(int i = 0; i < n; i++){
+        	if(ecc_v[i]==radius);
+        	centers.add(i);
+        		
+        }
         return centers;
-    } // central 
-   
- public int selectivityCriteria(Set<Integer> Centers){
-		Double ratio = 0.0;
-		int index = 0;
-		Double max = 0.0;
-		for(int cen: Centers){
-			//ratio = (double) (vertices[cen].length) / labelIndex.get(getLabel(cen)).size());
-			if(max<ratio){
-				max = ratio;
-				index = cen;
-			}
-		}
-
-		return index;
-
-
-	}
+    } // central
     
 
     public static void main(String[] args) { // test code

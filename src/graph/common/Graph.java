@@ -17,7 +17,7 @@ import java.util.Set;
 
 import static java.lang.System.out;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 /** This class holds any graph in a 2D array. Named as Graph since this will be used for query graphs in GPS
  *  @author Usman Nisar, Arash Fard
@@ -32,7 +32,7 @@ public class Graph {
 	 */
 	public int[][] vertices = null;
 	public int[] allIds = null;
-	private static Logger logger = Logger.getLogger(Graph.class);
+	//private static Logger logger = Logger.getLogger(Graph.class);
 	private int diameter = -1;
 	private int radius = -1;
 	public Map<Integer, Set<Integer>> labelIndex = null;
@@ -54,7 +54,7 @@ public class Graph {
 	public Graph(int size) {
 		vertices = new int[size][];
 	}
-	
+
 
 	/*************************************************************
 	 * Auxiliary constructor
@@ -107,11 +107,11 @@ public class Graph {
 			//Close the input stream
 			in.close();
 
-			logger.info("Successfully read the query graph");
+			//logger.info("Successfully read the query graph");
 
 		} // try
 		catch (Exception e) {//Catch exception if any
-			logger.error("Error: " + e.getMessage());
+			//logger.error("Error: " + e.getMessage());
 		} //catch
 	}
 
@@ -268,7 +268,7 @@ public class Graph {
 		try {
 			return vertices[id][0];
 		} catch (java.lang.NullPointerException ex) {
-			logger.error("For the id " + id);
+			//logger.error("For the id " + id);
 			return -1;
 		}
 	}
@@ -349,7 +349,7 @@ public class Graph {
 		//return getChildIndex().get(id);
 	}	
 
-	
+
 
 	/*************************************************************
 	 * Gets the number of vertices that can be in the graph
@@ -542,117 +542,117 @@ public class Graph {
 		}
 	}
 
-//	/******************************************************************
-//	 * Creates a ball on a given vertex taking the radius and the graph as radius
-//	 * @param graph the parent graph on which the balls are created
-//	 * @param radius the radius of the ball
-//	 * @param id the vertex id which is the center of the ball
-//	 * @return A map of vertex ids and their corresponding adjacency lists
-//	 */
-//
-//	public Map<Integer, Set<Integer>> getBall(Graph graph, int center, int radius) {
-//		//Map<Integer, Set<Integer>> ball = new HashMap<Integer, Set<Integer>> ();
-//
-//		Map<Integer, Set<Integer>> adjSet = new HashMap<Integer, Set<Integer>> ();
-//		Map<Integer, Set<Integer>> parList = new HashMap<Integer, Set<Integer>> ();
-//		Set<Integer> borderNodes = new HashSet<Integer>();
-//		Set<Integer> nodesInBall = new HashSet<Integer>();
-//		Queue<Integer> qu = new LinkedList<Integer> ();
-//		Map<Integer, Integer> distance = new LinkedHashMap<Integer, Integer> ();
-//		int n = vertices.length;
-//		//boolean[] go = new boolean[n];
-//		//int[] len = new int[n];
-//		int depth = 0;
-//		distance.clear();
-//		distance.put(center, 0);
-//		nodesInBall.add(center);
-//
-//		adjSet.put(center, graph.post(center));
-//		parList.put(center, graph.pre(center));
-//		//System.out.println(parList);
-//		//		qu.clear();
-//		//		qu.offer(center);
-//		while (!distance.isEmpty()){
-//			Entry<Integer, Integer> vdPair = distance.entrySet().iterator().next();			
-//			distance.remove(vdPair.getKey());
-//			int nextV = vdPair.getKey();
-//			depth = vdPair.getValue();
-//			System.out.println("the next vertex "+nextV);
-//			out.println("the depth "+vdPair.getValue());	
-//			System.out.println("---------");				//System.out.println();
-//			if(vdPair.getValue()==radius){
-//				System.out.println("entered bordernodesloop");
-//				borderNodes.add(vdPair.getKey());
-//			}else{
-//				Set<Integer> children = graph.post(nextV);
-//				System.out.println("the children of"+nextV+"are"+children);
-//				Set<Integer> parents = graph.pre(nextV);
-//				System.out.println("the parents of"+nextV+"are"+parents);
-//
-//				for(int child:children){
-//					if(!nodesInBall.contains(child)){
-//						System.out.println("entered children loop");
-//						nodesInBall.add(child);
-//						distance.put(child, depth+1);
-//						//System.out.println("THE DEPTH IS "+depth);
-//						System.out.println("---------DISTANCE"+distance);	
-//					}
-//
-//				}
-//
-//				for(int parent:parents){
-//					if(!nodesInBall.contains(parent)){
-//						System.out.println("entered parents loop");
-//						nodesInBall.add(parent);
-//						distance.put(parent, depth+1);
-//						System.out.println("---------DISTANCE"+distance);
-//					}
-//
-//				}
-//
-//			}
-//		}
-//		System.out.println(nodesInBall);
-//		System.out.println("***********************");
-//		for (int node:nodesInBall){
-//			System.out.println("^^^"+node);
-//			Set<Integer> children = graph.post(node);
-//			Set<Integer> parents = graph.pre(node);
-//			if(!adjSet.containsKey(node)){
-//				Set<Integer> tempAdj = new HashSet<Integer>();
-//				adjSet.put(node,tempAdj );				
-//			}
-//			if(!parList.containsKey(node)){
-//				Set<Integer> tempPar = new HashSet<Integer>();
-//				parList.put(node, tempPar);
-//			}
-//			for(int child:children){
-//				if(nodesInBall.contains(child)){
-//					if(!parList.containsKey(child)){
-//						Set<Integer> pre = new HashSet<Integer>();
-//						pre.add(node);
-//						parList.put(child, pre);
-//					}else 
-//						if (parList.containsKey(child)){
-//							(parList.get(child)).add(node);
-//						}
-//				}				
-//
-//			}
-//			for(int parent :parents){
-//				if(nodesInBall.contains(parent)){
-//					if(!adjSet.containsKey(parent)){
-//						Set<Integer> post = new HashSet<Integer>();
-//						post.add(node);
-//						adjSet.put(parent,post);
-//					}else			
-//						if(adjSet.containsKey(parent)){
-//							(adjSet.get(parent)).add(node);
-//						}
-//				}
-//			}
-//		return adjSet;
-//	}
+	//	/******************************************************************
+	//	 * Creates a ball on a given vertex taking the radius and the graph as radius
+	//	 * @param graph the parent graph on which the balls are created
+	//	 * @param radius the radius of the ball
+	//	 * @param id the vertex id which is the center of the ball
+	//	 * @return A map of vertex ids and their corresponding adjacency lists
+	//	 */
+	//
+	//	public Map<Integer, Set<Integer>> getBall(Graph graph, int center, int radius) {
+	//		//Map<Integer, Set<Integer>> ball = new HashMap<Integer, Set<Integer>> ();
+	//
+	//		Map<Integer, Set<Integer>> adjSet = new HashMap<Integer, Set<Integer>> ();
+	//		Map<Integer, Set<Integer>> parList = new HashMap<Integer, Set<Integer>> ();
+	//		Set<Integer> borderNodes = new HashSet<Integer>();
+	//		Set<Integer> nodesInBall = new HashSet<Integer>();
+	//		Queue<Integer> qu = new LinkedList<Integer> ();
+	//		Map<Integer, Integer> distance = new LinkedHashMap<Integer, Integer> ();
+	//		int n = vertices.length;
+	//		//boolean[] go = new boolean[n];
+	//		//int[] len = new int[n];
+	//		int depth = 0;
+	//		distance.clear();
+	//		distance.put(center, 0);
+	//		nodesInBall.add(center);
+	//
+	//		adjSet.put(center, graph.post(center));
+	//		parList.put(center, graph.pre(center));
+	//		//System.out.println(parList);
+	//		//		qu.clear();
+	//		//		qu.offer(center);
+	//		while (!distance.isEmpty()){
+	//			Entry<Integer, Integer> vdPair = distance.entrySet().iterator().next();			
+	//			distance.remove(vdPair.getKey());
+	//			int nextV = vdPair.getKey();
+	//			depth = vdPair.getValue();
+	//			System.out.println("the next vertex "+nextV);
+	//			out.println("the depth "+vdPair.getValue());	
+	//			System.out.println("---------");				//System.out.println();
+	//			if(vdPair.getValue()==radius){
+	//				System.out.println("entered bordernodesloop");
+	//				borderNodes.add(vdPair.getKey());
+	//			}else{
+	//				Set<Integer> children = graph.post(nextV);
+	//				System.out.println("the children of"+nextV+"are"+children);
+	//				Set<Integer> parents = graph.pre(nextV);
+	//				System.out.println("the parents of"+nextV+"are"+parents);
+	//
+	//				for(int child:children){
+	//					if(!nodesInBall.contains(child)){
+	//						System.out.println("entered children loop");
+	//						nodesInBall.add(child);
+	//						distance.put(child, depth+1);
+	//						//System.out.println("THE DEPTH IS "+depth);
+	//						System.out.println("---------DISTANCE"+distance);	
+	//					}
+	//
+	//				}
+	//
+	//				for(int parent:parents){
+	//					if(!nodesInBall.contains(parent)){
+	//						System.out.println("entered parents loop");
+	//						nodesInBall.add(parent);
+	//						distance.put(parent, depth+1);
+	//						System.out.println("---------DISTANCE"+distance);
+	//					}
+	//
+	//				}
+	//
+	//			}
+	//		}
+	//		System.out.println(nodesInBall);
+	//		System.out.println("***********************");
+	//		for (int node:nodesInBall){
+	//			System.out.println("^^^"+node);
+	//			Set<Integer> children = graph.post(node);
+	//			Set<Integer> parents = graph.pre(node);
+	//			if(!adjSet.containsKey(node)){
+	//				Set<Integer> tempAdj = new HashSet<Integer>();
+	//				adjSet.put(node,tempAdj );				
+	//			}
+	//			if(!parList.containsKey(node)){
+	//				Set<Integer> tempPar = new HashSet<Integer>();
+	//				parList.put(node, tempPar);
+	//			}
+	//			for(int child:children){
+	//				if(nodesInBall.contains(child)){
+	//					if(!parList.containsKey(child)){
+	//						Set<Integer> pre = new HashSet<Integer>();
+	//						pre.add(node);
+	//						parList.put(child, pre);
+	//					}else 
+	//						if (parList.containsKey(child)){
+	//							(parList.get(child)).add(node);
+	//						}
+	//				}				
+	//
+	//			}
+	//			for(int parent :parents){
+	//				if(nodesInBall.contains(parent)){
+	//					if(!adjSet.containsKey(parent)){
+	//						Set<Integer> post = new HashSet<Integer>();
+	//						post.add(node);
+	//						adjSet.put(parent,post);
+	//					}else			
+	//						if(adjSet.containsKey(parent)){
+	//							(adjSet.get(parent)).add(node);
+	//						}
+	//				}
+	//			}
+	//		return adjSet;
+	//	}
 	/*************************************************************
 	 * Get the label of all the vertices in the ball
 	 * @param the ball which is a Map of vertices and their outgoing edges 
@@ -690,25 +690,129 @@ public class Graph {
 		}
 		return index;
 	}
+	/********************************************************************************
+	 * Method to Print a Graph
+	 */
+
+	public void print(){
+		System.out.println("The Graph is:");
+		System.out.println();
+		System.out.println("The Adjacency List is:");
+		for(Entry<Integer,Set<Integer>> entry: childIndex.entrySet()){
+			System.out.println(entry.getKey()+" ---> "+entry.getValue());
+		}
+		System.out.println();
+		System.out.println("The Label Map is:");
+		for(Entry<Integer,Set<Integer>> entry: labelIndex.entrySet()){
+			System.out.println(entry.getKey()+" ---> "+entry.getValue());
+		}
+
+	}
+
+	/********************************************************************************
+	 * Method to obtain a INDUCED SUBGRAPH from the dataGraph.
+	 * @param Set of Vertices to be input as the candidate vertices.
+	 * 
+	 */
+	public Graph inducedSubgraph(Set<Integer> set){
+		Map<Integer,Set<Integer>> adjSet = new HashMap<Integer,Set<Integer>>();
+		Map<Integer,Set<Integer>> parList = new HashMap<Integer,Set<Integer>>();
+		Map<Integer,Set<Integer>> newLabelIndex = new HashMap<Integer,Set<Integer>>();
+
+
+		for(int node:set){
+			Set<Integer> temp = new HashSet<Integer>();
+
+			for(int u : childIndex.get(node)){					
+				if(set.contains(u)){
+					temp.add(u);
+				}					
+			}
+			adjSet.put(node, temp);
+		}
+
+		for(int node:set){
+			Set<Integer> temp = new HashSet<Integer>();
+			for(int v : parentIndex.get(node)){
+				if(set.contains(v)){
+					temp.add(v);
+				}
+			}
+			parList.put(node, temp);
+		}
+
+
+		for (int w:set) {
+			if (newLabelIndex.get(getLabel(w)) == null) {
+				Set<Integer> vSet = new HashSet();
+				vSet.add(w);
+				newLabelIndex.put(getLabel(w), vSet);
+			} else {
+				newLabelIndex.get(getLabel(w)).add(w);
+			}
+		}
+		
+		//PRINTING THE GRAPH - WE CAN USE THE PRINT METHOD TOO.
+//		System.out.println("The Adjacency List is:");
+//		for(Entry<Integer,Set<Integer>> entry: adjSet.entrySet()){
+//			System.out.println(entry.getKey()+" ---> "+entry.getValue());
+//		}
+//		System.out.println();
+//
+//		System.out.println("The Parent List is:");
+//		for(Entry<Integer,Set<Integer>> entry: parList.entrySet()){
+//			System.out.println(entry.getKey()+" ---> "+entry.getValue());
+//			
+//		}
+//		
+//		System.out.println("The Label Index is:");
+//		for(Entry<Integer,Set<Integer>> entry: newLabelIndex.entrySet()){
+//			System.out.println(entry.getKey()+" ---> "+entry.getValue());
+//			
+//		}
+		
+		
+		
+		Graph subGraph = new Graph();
+		subGraph.childIndex = adjSet;
+		subGraph.parentIndex = parList;
+		subGraph.labelIndex = newLabelIndex;
+		
+		return subGraph;
+		
+	}
+
+
+
 
 
 	public static void main (String[] args) {
-		Graph g = new Graph("/Users/Satya/Desktop/dataGraph.txt");
+		Graph g = new Graph("/Users/Satya/Desktop/testGraph.txt");
 		g.getAllIds();
 		g.getParentIndex();
 		g.getChildIndex();
 		g.getLabelIndex();
+		Set<Integer> set = new HashSet<Integer>();
+		set.add(0); 
+		set.add(1);
+		//set.add(2);
+		Graph subGraph = g.inducedSubgraph(set);
+		subGraph.print();
+		Ball b = new Ball(subGraph,0,1);			//(Ball( graph, center, radius)
 		System.out.println();
-		System.out.println("The parent Index is "+g.parentIndex);
+		System.out.println(b.getBallAsString());
 		
+		Ball bigBall  = new Ball(g,0,1);
 		System.out.println();
-		System.out.println("The childIndex Index is "+g.childIndex);
+		System.out.println(bigBall.getBallAsString());
 		
-		
-//		GraphMetrics qMet = new GraphMetrics(q.vertices);
+
+
+
+		//		GraphMetrics qMet = new GraphMetrics(q.vertices);
 		//out.println("-------------------------------------------"+g.parentIndex.get(0));
-//		System.out.println("the centers are "+qMet.central());
-//		System.out.println("the vertices from selectivity criteria are"+q.selectivityCriteria(qMet.central()));
+		//		System.out.println("the centers are "+qMet.central());
+		//		System.out.println("the vertices from selectivity criteria are"+q.selectivityCriteria(qMet.central()));
 		//	g.getLabelIndex();
 		//	g.getAllIds();
 
@@ -726,14 +830,14 @@ public class Graph {
 		//		System.out.println(g.getParentIndex());
 		//		System.out.println(g.getChildIndex());
 		//		System.out.println("the diameter is:"+g.getDiameter());
-		
-		long ballStartTime = System.nanoTime();	
-		Ball ball = new Ball(g,3,2);
-		long ballStopTime = System.nanoTime();	
-		System.out.println("Ball Creation Time: " + (ballStopTime-ballStartTime)/1000000.0+" ms");
-		System.out.println();
-		System.out.println("the BALL is "+ball.getBallAsString());
-//		System.out.println();
-//		System.out.println("The parent Index is "+g.parentIndex);
+		//		
+		//		long ballStartTime = System.nanoTime();	
+		//		Ball ball = new Ball(g,3,2);
+		//		long ballStopTime = System.nanoTime();	
+		//		System.out.println("Ball Creation Time: " + (ballStopTime-ballStartTime)/1000000.0+" ms");
+		//		System.out.println();
+		//		System.out.println("the BALL is "+ball.getBallAsString());
+		////		System.out.println();
+		////		System.out.println("The parent Index is "+g.parentIndex);
 	}
 }

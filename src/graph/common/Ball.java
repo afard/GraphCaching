@@ -49,8 +49,10 @@ public class Ball {
 		distance.put(center, 0);
 		nodesInBall.add(center);
 		//adjSet.put(center, graph.post(center)); //Uncomment all these and comment the ones below if the graph is not populated
+		if(graph.childIndex==null)graph.getChildIndex();
 		adjSet.put(center, graph.childIndex.get(center));
 		//parList.put(center, graph.pre(center));
+		if(graph.parentIndex==null)graph.getParentIndex();
 		parList.put(center, graph.parentIndex.get(center));
 		
 		while (!distance.isEmpty()){
@@ -64,8 +66,10 @@ public class Ball {
 			}			
 			else{
 				//Set<Integer> children = graph.post(nextV);
+				if(graph.childIndex==null)graph.getChildIndex();
 				Set<Integer> children = graph.childIndex.get(nextV);
 				//Set<Integer> parents = graph.pre(nextV);
+				//if(graph.parentIndex==null)graph.getParentIndex();
 				Set<Integer> parents = graph.parentIndex.get(nextV);
 				
 
@@ -200,13 +204,23 @@ public class Ball {
 	}
 	
 	public static void main (String[] args) {
-		Graph g = new Graph("/Users/Satya/Desktop/dataGraph.txt");
-		Ball ball = new Ball(g,4,3);
-		int[] centers = {0, 1, 2, 5, 7, 8, 9};
-		for(int i:centers){
-			System.out.println((new Ball(g,i,2)).getBallAsString());
-			System.out.println();
-		}
+		Graph g = new Graph("/Users/Satya/Desktop/datagraph.txt");
+		g.getChildIndex();
+		g.getAllIds();
+		g.getParentIndex();
+		//Ball ball = new Ball(g,4,3);
+//		int[] centers = {2};
+//		for(int i:centers){
+//			System.out.println(i+"---"+(new Ball(g,i,1)).getBallAsString());
+//			System.out.println();
+//		}
+		
+		Graph g1 = new Graph("/Users/Satya/Desktop/testGraph.txt");
+		g1.getChildIndex();
+		g1.getAllIds();
+		g1.getParentIndex();
+		Ball b = new Ball(g1,0,1);
+		System.out.println(b.getBallAsString());
 		
 //		System.out.println("BALL DIAMETER = "+ball.getBallDiameter());
 //		System.out.println();
