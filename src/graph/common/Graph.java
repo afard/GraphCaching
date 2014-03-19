@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import static java.lang.System.out;
@@ -639,7 +640,7 @@ public class Graph {
 		System.out.println("The Graph is:");
 		System.out.println();
 		System.out.println("The Adjacency List is:");
-		for(Entry<Integer,Set<Integer>> entry: childIndex.entrySet()){
+		for(Entry<Integer, Set<Integer>> entry: childIndex.entrySet()){
 			System.out.println(entry.getKey()+" ---> "+entry.getValue());
 		}
 		System.out.println();
