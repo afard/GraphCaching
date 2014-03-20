@@ -96,21 +96,22 @@ public class SequentialStrong {
 		Map<Integer, Ball> balls = new HashMap<Integer,Ball>();
 		Set<Integer> matchCenters = new HashSet<Integer>();
 
-		long ballTime = 0;
+		long ballTime = 0;	
 
 		// BALL CREATION STEP:
-
+		//for(int center : centerList){
 		for(int center:nodesInDualSimSet){
 
 			long ballStartTime = System.nanoTime();	
 			Ball ball = new Ball(newGraph,center,queryDiameter); // BALL CREATION STEP
 			//System.out.println(ball.ballCenter+"--"+ball.getBallAsString());
+			//out.println(center+"  --->   "+ball.nodesInBall);
 			long ballStopTime = System.nanoTime();	
 			ballTime+=(ballStopTime-ballStartTime);
 			ballSum += ball.nodesInBall.size(); 			
 			int ballCenter = ball.ballCenter;
 			Map<Integer,Set<Integer>> clone = new HashMap<Integer,Set<Integer>>(dualSimSet);	
-			Map<Integer,Set<Integer>> mat = SequentialStrong.getDualFilter(query, clone, ball);
+			Map<Integer,Set<Integer>> mat = SequentialStrong.dualFilter(query, clone, ball);
 			balls.put(ballCenter, ball);
 			if(mat.size()!=0)
 			{
@@ -650,10 +651,12 @@ public class SequentialStrong {
 
 	}
 	
-	public static void main (String[] args) {
-		Graph g = new Graph("exampleGraphs/G_tight1.txt");
-		Graph q = new Graph("exampleGraphs/Q_tight1.txt");
-		System.out.println(args[0]);
-		SequentialStrong.getStrongSimMap(g, q,args[0]);
+	public static void main (String[] args) throws InterruptedException {
+		//Thread.sleep(10000);
+		Graph g = new Graph("/Users/Satya/Desktop/datagraph.txt");
+		Graph q = new Graph("/Users/Satya/Desktop/query.txt");
+		//System.out.println(args[0]);
+		String sim = "strict";
+		SequentialStrong.getStrongSimMap(g, q,sim);
 	}
 }

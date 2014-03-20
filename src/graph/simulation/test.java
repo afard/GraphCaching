@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+
+// THIS IS THE TEST COMMENT
 public class test {
 	public static void main(String[] args) {
 		Set<Integer> nodesInBall1 = new HashSet<Integer>();
@@ -60,6 +62,10 @@ public class test {
 		Set<String> mySet = new HashSet<String>(Arrays.asList(str));
 		System.out.println(mySet);
 		
+		Set<Integer> centerList = new HashSet<Integer>(); // Doing this to find the vertices from query Selectivity 
+		Integer[] cList = {1, 684, 817, 816, 556, 130, 153, 154, 18, 696, 561, 145, 264, 265, 516, 33, 649, 310, 525, 916, 520, 186, 290, 909, 905, 667, 540, 297, 181, 896, 343, 751, 475, 336, 618, 197, 760, 761, 868, 639, 375, 714, 717, 580, 719, 110, 862, 116, 732, 114, 974, 490, 367, 604};
+		centerList.addAll(Arrays.asList(cList));
+		System.out.println("******"+centerList.size());
 		
 		
 		//System.out.println(filterSet.lowerEntry(key));

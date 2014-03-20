@@ -640,7 +640,14 @@ public class Graph {
 		System.out.println("The Graph is:");
 		System.out.println();
 		System.out.println("The Adjacency List is:");
+		if(childIndex ==null)getChildIndex();
 		for(Entry<Integer, Set<Integer>> entry: childIndex.entrySet()){
+			System.out.println(entry.getKey()+" ---> "+entry.getValue());
+		}
+		System.out.println();
+		System.out.println("The Parent List is:");
+		if(parentIndex ==null)getParentIndex();
+		for(Entry<Integer, Set<Integer>> entry: parentIndex.entrySet()){
 			System.out.println(entry.getKey()+" ---> "+entry.getValue());
 		}
 		System.out.println();
@@ -664,7 +671,7 @@ public class Graph {
 
 		for(int node:set){
 			Set<Integer> temp = new HashSet<Integer>();
-
+			if(childIndex ==null) getChildIndex();
 			for(int u : childIndex.get(node)){					
 				if(set.contains(u)){
 					temp.add(u);
@@ -675,6 +682,7 @@ public class Graph {
 
 		for(int node:set){
 			Set<Integer> temp = new HashSet<Integer>();
+			if(parentIndex ==null) getParentIndex();
 			for(int v : parentIndex.get(node)){
 				if(set.contains(v)){
 					temp.add(v);
@@ -740,13 +748,13 @@ public class Graph {
 		//set.add(2);
 		Graph subGraph = g.inducedSubgraph(set);
 		subGraph.print();
-		Ball b = new Ball(subGraph,0,1);			//(Ball( graph, center, radius)
-		System.out.println();
-		System.out.println(b.getBallAsString());
-		
-		Ball bigBall  = new Ball(g,0,1);
-		System.out.println();
-		System.out.println(bigBall.getBallAsString());
+//		Ball b = new Ball(subGraph,0,1);			//(Ball( graph, center, radius)
+//		System.out.println();
+//		System.out.println(b.getBallAsString());
+//		
+//		Ball bigBall  = new Ball(g,0,1);
+//		System.out.println();
+//		System.out.println(bigBall.getBallAsString());
 		
 
 

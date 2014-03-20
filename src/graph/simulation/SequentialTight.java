@@ -35,26 +35,21 @@ public class SequentialTight {
 	static int queryGraphSize = 0;
 
 
-	public static void getTight(Graph dGraph, Graph query ){
+	public static void getTight(Graph dGraph, Graph query,String sim ){
 
 		dataGraphSize = dGraph.getAllIds().length;
 		queryGraphSize = query.getAllIds().length;
+
+
+
+		GraphMetrics qMet = new GraphMetrics(query.vertices);
+
 		System.out.println();
-		System.out.println();
+
 		System.out.println("The size of Data Graph is: "+dataGraphSize+" nodes");
 		System.out.println("The size of Query Graph is: "+queryGraphSize+" nodes");
 		System.out.println();
 
-
-		GraphMetrics qMet = new GraphMetrics(query.vertices);		
-		long qDiaStart = System.nanoTime();
-		int qDiameter = qMet.rad();
-		long qDiaStop = System.nanoTime();
-
-		System.out.println("Finding Query diamter: " + (qDiaStop-qDiaStart)/1000000.0+" ms");
-		System.out.println();
-		System.out.println("The Query diameter is: "+qDiameter);
-		System.out.println();
 
 		long dualTimeStart = System.nanoTime();
 		Map<Integer,Set<Integer>> dualSimSet = DualSimulation.getDual(dGraph, query);
@@ -69,32 +64,34 @@ public class SequentialTight {
 			System.exit(0);		
 		}
 
-
-		// GENERATING THE MATCH GRAPH		
-
-		Graph newGraph = dGraph;
-		long pruningStart = System.nanoTime();	
-		newGraph = filterGraph(dGraph,query,dualSimSet);
-
-		//newGraph.print(); // print() method is useful for printing the graph after modifying it - Helpful for debugging
-
-
-		long pruningStop = System.nanoTime();	
-		System.out.println("Graph Pruning Time: " + (pruningStop-pruningStart)/1000000.0+" ms");
-		System.out.println();
-
-
 		Set<Integer> nodesInDualSimSet = new HashSet<Integer>();
 		for (Set<Integer> set : dualSimSet.values()){
 			for(int id:set){
 				nodesInDualSimSet.add(id);
 			}
 		}
+		Graph newGraph = dGraph;
+		long pruningStart = System.nanoTime();
+		newGraph = filterGraph(dGraph,query,dualSimSet);
+		//newGraph.print();	
+		long pruningStop = System.nanoTime();	
+		System.out.println("Graph Pruning Time: " + (pruningStop-pruningStart)/1000000.0+" ms");
+		System.out.println();
+
+
 
 		System.out.println("The nodes in Dual Sim Set are : "+nodesInDualSimSet);
 		System.out.println();
 		System.out.println("Graph Size after Pruning is: "+nodesInDualSimSet.size()+" nodes");
+		System.out.println();
 
+		long qDiaStart = System.nanoTime();
+		int qDiameter = query.getRadius(); // changed from qMet to normal getRadius method in Graph.java
+		long qDiaStop = System.nanoTime();
+		System.out.println("Time for finding Query diameter: " + (qDiaStop-qDiaStart)/1000000.0+" ms");
+		System.out.println();
+		System.out.println("The Query diameter is: "+qDiameter);
+		System.out.println();
 
 		int ballSum = 0;
 
@@ -113,15 +110,17 @@ public class SequentialTight {
 		System.out.println("\nThe nodes from DUAL SIM (which should be used) after query selectivity are: "+dualSimSet.get(query.selectivityCriteria(qMet.central()))); 
 
 
-		// ****** BALL CREATION STEP ********* //
 
+		// ****** BALL CREATION STEP ********* //
 
 
 		for(int center:dualSimSet.get(query.selectivityCriteria(qMet.central()))){
 
-			long ballStartTime = System.nanoTime();				
+			long ballStartTime = System.nanoTime();	
+			//
 			Ball ball = new Ball(newGraph,center,qDiameter); // BALL CREATION			
 			//System.out.println(ball.ballCenter+"--"+ball.getBallAsString());
+			
 			long ballStopTime = System.nanoTime();	
 			ballCreationTime += (ballStopTime-ballStartTime);
 
@@ -130,7 +129,7 @@ public class SequentialTight {
 			Map<Integer,Set<Integer>> clone = new HashMap<Integer,Set<Integer>>(dualSimSet);
 
 			// DUAL FILTER STEP
-			Map<Integer,Set<Integer>> mat = getDualFilter(query, clone, ball);
+			Map<Integer,Set<Integer>> mat = dualFilter(query, clone, ball);
 			long dualFilterTimeStop = System.nanoTime();
 			dualFilterTime+=(dualFilterTimeStop-dualFilterTimeStart);
 			balls.put(center, ball);
@@ -141,7 +140,7 @@ public class SequentialTight {
 			}
 
 		}	
-		System.out.println("----------------------------------------------------------------------");
+		
 
 		System.out.println();
 		System.out.println("Total no. of Balls: " + balls.keySet().size()+" balls");
@@ -150,13 +149,14 @@ public class SequentialTight {
 		System.out.println();
 		System.out.println("Creating and filtering balls " + (ballCreationTime+dualFilterTime)/1000000.0+" ms");
 		System.out.println();		
-		System.out.println("******************************************************************");
+		System.out.println("******************************************************************");		
+		System.out.println("The DISTRIBUTED FORMAT RESULT IS:");
 		System.out.println();
-		System.out.println("The Distributed Format result is:");
-
 		System.out.println("The candidate nodes are: " + printRes(dGraph, balls, matchCenters));
 		System.out.println();
 		System.out.println("Number of Tight Simulation Matches: "+matchCenters.size());
+		System.out.println();
+
 	}
 
 
@@ -212,6 +212,7 @@ public class SequentialTight {
 			int v = filterSet.get(u);
 
 			out.println("U --> "+u+"  V --> "+v);
+			filterSet.remove(u);
 
 
 			clone.get(u).remove(v);	
@@ -390,7 +391,12 @@ public class SequentialTight {
 			}
 			System.out.println(nodeId + " " + g.getLabel(nodeId)+ " " + ballString + " " + isMatch);
 		}		
+		System.out.println();
+		System.out.println("******************************************************");
+		System.out.println();
 		System.out.println("Post Processing Time is: "+postProcessingTime/1000000.0+" ms");
+		System.out.println();
+		
 		return finalCandidates;
 	}
 
@@ -403,7 +409,7 @@ public class SequentialTight {
 	 * @param Query Graph
 	 * @param Dual Simulation Set
 	 */
-	
+
 	public static Graph filterGraph(Graph g, Graph q, Map<Integer,Set<Integer>> simSet ){
 		Set<Integer> nodesInDualSimSet = new HashSet<Integer>();
 
@@ -452,9 +458,9 @@ public class SequentialTight {
 		}
 		Graph g1 = new Graph();
 		g1.childIndex = newChildIndex;
-		g1.parentIndex = newParentIndex;
+		g1.parentIndex = g.parentIndex;
 		g1.labelIndex = g.labelIndex;
-		return g1;
+		return g1;	
 
 	}
 
@@ -547,7 +553,8 @@ public class SequentialTight {
 			int u = p.getValue0();
 			int v = p.getValue1();
 			filterSet.pop();
-			out.println("entered the while loop");
+			out.println("U --> "+u+"  V --> "+v);
+			//out.println("entered the while loop");
 
 
 
@@ -641,7 +648,7 @@ public class SequentialTight {
 				matchNodes.add(id);
 			}
 		}
-		
+
 		//TRIMMING THE BALL EDGES - (ONLY for Printing Purposes.)
 
 		b.adjSet = new HashMap<Integer,Set<Integer>>();
@@ -670,17 +677,39 @@ public class SequentialTight {
 		}
 		return clone;
 	}
+	/*****************************************************************
+	 * ANOTHER DUAL FILTER
+	 * @param query
+	 * @param clone
+	 * @param b
+	 * @return
+	 */
+	public static Map<Integer,Set<Integer>> getDualFil(Graph query, Map<Integer,Set<Integer>> clone, Ball b){
+
+		//System.out.println(b.nodesInBall);
+		for(int key : clone.keySet()){
+			Set<Integer> temp = new HashSet<Integer> ();
+			temp =Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(clone.get(key), b.nodesInBall));
+			clone.put(key, temp);
+		}
+
+		//System.out.println(clone);
+
+
+		return clone;
+	}
+
 
 	public static void main(String[] args) {
 
-		Graph g = new Graph("exampleGraphs/G_tight1.txt");
-		Graph q = new Graph("exampleGraphs/Q_tight1.txt");
+		Graph g = new Graph("/Users/Satya/Desktop/datagraph.txt");
+		Graph q = new Graph("/Users/Satya/Desktop/query.txt");
 		System.out.println("Started SEQUENTIAL TIGHT:.....");
 
 		long tightStart = System.nanoTime();
-		SequentialTight.getTight(g, q); // pass the data graph and the query graph as the arguments.
-		long tightStop = System.nanoTime();
-		System.out.println("******************************************************");		
+		String sim = "strict";
+		SequentialTight.getTight(g, q,sim); // pass the data graph and the query graph as the arguments.
+		long tightStop = System.nanoTime();				
 		System.out.println("The total Time for the entireProcessing is: "+(tightStop-tightStart)/1000000.0+" ms");
 		System.out.println();
 
