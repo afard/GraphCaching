@@ -34,8 +34,14 @@ public class SequentialTight {
 	static int dataGraphSize = 0;
 	static int queryGraphSize = 0;
 
-
-	public static void getTight(Graph dGraph, Graph query,String sim ){
+	/******************************************************************************************************
+	 * 
+	 * @param dGraph - The Data Graph.
+	 * @param query - The Query graph.
+	 * @return All the subgraphs i.e., the balls, in this case a Map where K is the center and V is the Ball.
+	 */
+	
+	public static Map<Integer,Ball> getTight(Graph dGraph, Graph query ){
 
 		dataGraphSize = dGraph.allIds.length;
 		queryGraphSize = query.allIds.length;		
@@ -58,7 +64,7 @@ public class SequentialTight {
 		
 
 
-		if(dualSimSet.size() ==0){
+		if(dualSimSet.isEmpty()){
 			System.out.println("No Dual Match"); 
 			System.exit(0);		
 		}
@@ -100,8 +106,8 @@ public class SequentialTight {
 		// ****** BALL CREATION STEP ********* // // error in selectivity and central:
 
 
-		//for(int center:dualSimSet.get(query.selectivityCriteria(qMet.central()))){
-		for(int center:dualSimSet.get(0)){
+		for(int center:dualSimSet.get(query.selectivityCriteria(qMet.central()))){
+		//for(int center:dualSimSet.get(86)){
 			long ballStartTime = System.currentTimeMillis();	
 			//
 			Ball ball = new Ball(newGraph,center,qDiameter); // BALL CREATION			
@@ -114,7 +120,8 @@ public class SequentialTight {
 			long dualFilterTimeStart = System.currentTimeMillis();
 			Map<Integer,Set<Integer>> clone = new HashMap<Integer,Set<Integer>>(dualSimSet);
 
-			// DUAL FILTER STEP
+			// ******** DUAL FILTER STEP  **********
+			
 			Map<Integer,Set<Integer>> mat = getDualFilter(query, clone, ball);
 			long dualFilterTimeStop = System.currentTimeMillis();
 			dualFilterTime+=(dualFilterTimeStop-dualFilterTimeStart);
@@ -145,7 +152,6 @@ public class SequentialTight {
 		System.out.println();
 		System.out.println("The Query diameter is: "+qDiameter);
 		System.out.println();
-
 		//** The below things are output to the console to be used for the tight simulation experiment.
 		System.out.println("\nThe nodes form query selectivity are: "+query.selectivityCriteria(qMet.central()));
 		System.out.println();
@@ -162,208 +168,209 @@ public class SequentialTight {
 		System.out.println();
 		System.out.println("Number of Tight Simulation Matches: "+matchCenters.size());
 		System.out.println();
-
+		
+		return balls;
 	}
 
 
-
-
-
-
-	/******************************************************************
-	 * perform DUAL FILTER STEP
-	 * 
-	 */																			
-
-	public static Map<Integer,Set<Integer>> dualFilter(Graph query, Map<Integer,Set<Integer>> clone, Ball b){
-
-		//Imposing the Ball on the Dual Simulation result i.e., keeping only the nodes common in the Ball and Dual Sim Set. 
-
-		for(int key:clone.keySet()){
-			Set<Integer> temp = new HashSet<Integer> ();
-			temp =Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(clone.get(key), b.nodesInBall));
-			clone.put(key, temp);
-		}
-
-		//System.out.println(clone);
-		TreeMap<Integer, Integer> filterSet = new TreeMap<Integer, Integer>(Collections.reverseOrder());
-		boolean filtered = false;
-
-		for(Map.Entry<Integer, Set<Integer>> entry : clone.entrySet()){
-			int u = entry.getKey();
-			for(int v : entry.getValue()){
-				if(b.borderNodes.contains(v)){
-					filtered = false;
-					for(int u1:query.post(u)){ 
-						if(Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.post(v),clone.get(u1))).isEmpty()){
-							filterSet.put(u, v);							
-							filtered = true;
-							break;
-						}
-					}
-					if(!filtered){
-						for(int u2:query.pre(u)){
-							if(Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.pre(v),clone.get(u2))).isEmpty()){
-								filterSet.put(u, v);
-							}
-						}
-					}
-				}
-			}
-		}
-
-
-		while(!filterSet.isEmpty()){
-			out.println("entered the while loop");
-			//the below steps are equivalent to popping an element from a stack. I used TreeMap instead of a stack.
-			int u = filterSet.firstKey();
-			int v = filterSet.get(u);
-
-			//out.println("U --> "+u+"  V --> "+v);
-			filterSet.remove(u);
-
-
-			clone.get(u).remove(v);	
-
-			for(int u2:query.pre(u)){
-				for(int v2:Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.pre(v),clone.get(u2)))){
-					if(Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.post(v2),clone.get(u))).isEmpty()){						
-						filterSet.put(u2, v2);
-					}
-				}
-			}
-			for(int u1:query.post(u)){
-				for(int v1:Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.post(v),clone.get(u1)))){
-					if(Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.pre(v1),clone.get(u))).isEmpty()){
-						filterSet.put(u1, v1);
-					}
-				}
-			}		
-		}
-
-		Map<Integer,Set<Integer>> adjSet = new HashMap<Integer,Set<Integer>>();
-		Map<Integer,Set<Integer>> parList = new HashMap<Integer,Set<Integer>>();
-
-		for(Map.Entry<Integer, Set<Integer>> entry : clone.entrySet()){
-			int u = entry.getKey();
-			for(int v:clone.get(u)){ // BREADCRUMB: here if any errors pop up.. change entry.getValue() TO qbIntersection.get(u) cos its (u,uSim)
-				for(int uc:query.post(u)){
-					for(int vc:Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.post(v),clone.get(uc)))){
-						if(!adjSet.containsKey(v)){
-							Set<Integer> post = new HashSet<Integer>();
-							post.add(vc);
-							adjSet.put(v, post);
-						}else
-							if(adjSet.containsKey(v)){
-								(adjSet.get(v)).add(vc);
-
-							}
-						if(!parList.containsKey(vc)){
-							Set<Integer> pre = new HashSet<Integer>();
-							pre.add(v);
-							parList.put(vc, pre);
-						}else
-							if(parList.containsKey(vc)){
-								(parList.get(vc)).add(v);					
-
-							}
-					}
-				}
-
-			}
-
-		}
-
-		//Finding Max perfect subgraph		
-		Stack<Integer> stack = new Stack<Integer> ();
-		Set<Integer> visited = new HashSet<Integer>();
-		visited.add(b.ballCenter);
-		stack.push(b.ballCenter);
-		while(!stack.isEmpty()){
-			int v = stack.pop();
-			if ( adjSet.containsKey(v)) {
-				for ( int child: adjSet.get(v)) {
-					if (!visited.contains(child)) {
-						stack.push(child);
-						visited.add(child);
-					}
-				}
-			}
-
-			if ( parList.containsKey(v)) {
-				for ( int parent: parList.get(v)) {
-					if (!visited.contains(parent)) {
-						stack.push(parent);
-						visited.add(parent);
-					}
-				}
-			}
-		}
-
-		for ( int k: clone.keySet()) {
-			int[] res = Utils.intersectionOfTwoArrays(clone.get(k), visited);
-			clone.put(k, Utils.convertArrayToHashSet(res));
-		}
-		Set<Integer> matchNodes = new HashSet<Integer>();
-		for (Set<Integer> set : clone.values()){
-			for(int id:set){
-				matchNodes.add(id);
-			}
-		}
-		//out.println("The match nodes are "+ matchNodes);
-		//out.println("the adjSet form the graph is "+adjSet);
-		//The process of trimming the size of the ball starts here.
-		//System.out.println("the ball adjSet befre trimming is"+b.adjSet);
-		//		b.adjSet.clear();
-		//		//b.adjSet = new HashMap<Integer,Set<Integer>>();
-		//		for(int n :adjSet.keySet()){
-		//			if(adjSet.get(n)!=null){				
-		//				for(int nc : adjSet.get(n)){
-		//					if(matchNodes.contains(n) && matchNodes.contains(nc)){
-		//						if(!b.adjSet.containsKey(n)){
-		//							Set<Integer> temp = new HashSet<Integer>();
-		//							temp.add(nc);
-		//							b.adjSet.put(n, temp);
-		//						}else
-		//							if(b.adjSet.containsKey(n)){
-		//								(b.adjSet.get(n)).add(nc);
-		//
-		//							}
-		//					}
-		//				}
-		//			}
-		//		}
-		//out.println("the adjSet after trimming is "+ b.adjSet);
-
-		b.adjSet = new HashMap<Integer,Set<Integer>>();
-		for(Map.Entry<Integer, Set<Integer>> entry : adjSet.entrySet()){
-			for(int nc : entry.getValue()){
-				if(matchNodes.contains(entry.getKey()) && matchNodes.contains(nc)){
-					if(!b.adjSet.containsKey(entry.getKey())){
-						Set<Integer> temp = new HashSet<Integer>();
-						temp.add(nc);
-						b.adjSet.put(entry.getKey(), temp);
-					}else
-						if(b.adjSet.containsKey(entry.getKey())){
-							(b.adjSet.get(entry.getKey())).add(nc);
-						}
-				}
-			}
-
-		}
-		for(int v:clone.keySet()){
-			if((clone.get(v)).isEmpty()){
-				Set <Integer> temp = new HashSet<Integer>();
-				clone.put(v, temp);
-			}
-		}		
-		return clone;
-
-	}
+//	/******************************************************************
+//	 * perform DUAL FILTER STEP
+//	 * 
+//	 */																			
+//
+//	public static Map<Integer,Set<Integer>> dualFilter(Graph query, Map<Integer,Set<Integer>> clone, Ball b){
+//
+//		//Imposing the Ball on the Dual Simulation result i.e., keeping only the nodes common in the Ball and Dual Sim Set. 
+//
+//		for(int key:clone.keySet()){
+//			Set<Integer> temp = new HashSet<Integer> ();
+//			temp =Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(clone.get(key), b.nodesInBall));
+//			clone.put(key, temp);
+//		}
+//
+//		//System.out.println(clone);
+//		TreeMap<Integer, Integer> filterSet = new TreeMap<Integer, Integer>(Collections.reverseOrder());
+//		boolean filtered = false;
+//
+//		for(Map.Entry<Integer, Set<Integer>> entry : clone.entrySet()){
+//			int u = entry.getKey();
+//			for(int v : entry.getValue()){
+//				if(b.borderNodes.contains(v)){
+//					filtered = false;
+//					for(int u1:query.post(u)){ 
+//						if(Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.post(v),clone.get(u1))).isEmpty()){
+//							filterSet.put(u, v);							
+//							filtered = true;
+//							break;
+//						}
+//					}
+//					if(!filtered){
+//						for(int u2:query.pre(u)){
+//							if(Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.pre(v),clone.get(u2))).isEmpty()){
+//								filterSet.put(u, v);
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//
+//
+//		while(!filterSet.isEmpty()){
+//			out.println("entered the while loop");
+//			//the below steps are equivalent to popping an element from a stack. I used TreeMap instead of a stack.
+//			int u = filterSet.firstKey();
+//			int v = filterSet.get(u);
+//
+//			//out.println("U --> "+u+"  V --> "+v);
+//			filterSet.remove(u);
+//
+//
+//			clone.get(u).remove(v);	
+//
+//			for(int u2:query.pre(u)){
+//				for(int v2:Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.pre(v),clone.get(u2)))){
+//					if(Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.post(v2),clone.get(u))).isEmpty()){						
+//						filterSet.put(u2, v2);
+//					}
+//				}
+//			}
+//			for(int u1:query.post(u)){
+//				for(int v1:Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.post(v),clone.get(u1)))){
+//					if(Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.pre(v1),clone.get(u))).isEmpty()){
+//						filterSet.put(u1, v1);
+//					}
+//				}
+//			}		
+//		}
+//
+//		Map<Integer,Set<Integer>> adjSet = new HashMap<Integer,Set<Integer>>();
+//		Map<Integer,Set<Integer>> parList = new HashMap<Integer,Set<Integer>>();
+//
+//		for(Map.Entry<Integer, Set<Integer>> entry : clone.entrySet()){
+//			int u = entry.getKey();
+//			for(int v:clone.get(u)){ // BREADCRUMB: here if any errors pop up.. change entry.getValue() TO qbIntersection.get(u) cos its (u,uSim)
+//				for(int uc:query.post(u)){
+//					for(int vc:Utils.convertArrayToHashSet(Utils.intersectionOfTwoArrays(b.post(v),clone.get(uc)))){
+//						if(!adjSet.containsKey(v)){
+//							Set<Integer> post = new HashSet<Integer>();
+//							post.add(vc);
+//							adjSet.put(v, post);
+//						}else
+//							if(adjSet.containsKey(v)){
+//								(adjSet.get(v)).add(vc);
+//
+//							}
+//						if(!parList.containsKey(vc)){
+//							Set<Integer> pre = new HashSet<Integer>();
+//							pre.add(v);
+//							parList.put(vc, pre);
+//						}else
+//							if(parList.containsKey(vc)){
+//								(parList.get(vc)).add(v);					
+//
+//							}
+//					}
+//				}
+//
+//			}
+//
+//		}
+//
+//		//Finding Max perfect subgraph		
+//		Stack<Integer> stack = new Stack<Integer> ();
+//		Set<Integer> visited = new HashSet<Integer>();
+//		visited.add(b.ballCenter);
+//		stack.push(b.ballCenter);
+//		while(!stack.isEmpty()){
+//			int v = stack.pop();
+//			if ( adjSet.containsKey(v)) {
+//				for ( int child: adjSet.get(v)) {
+//					if (!visited.contains(child)) {
+//						stack.push(child);
+//						visited.add(child);
+//					}
+//				}
+//			}
+//
+//			if ( parList.containsKey(v)) {
+//				for ( int parent: parList.get(v)) {
+//					if (!visited.contains(parent)) {
+//						stack.push(parent);
+//						visited.add(parent);
+//					}
+//				}
+//			}
+//		}
+//
+//		for ( int k: clone.keySet()) {
+//			int[] res = Utils.intersectionOfTwoArrays(clone.get(k), visited);
+//			clone.put(k, Utils.convertArrayToHashSet(res));
+//		}
+//		Set<Integer> matchNodes = new HashSet<Integer>();
+//		for (Set<Integer> set : clone.values()){
+//			for(int id:set){
+//				matchNodes.add(id);
+//			}
+//		}
+//		//out.println("The match nodes are "+ matchNodes);
+//		//out.println("the adjSet form the graph is "+adjSet);
+//		//The process of trimming the size of the ball starts here.
+//		//System.out.println("the ball adjSet befre trimming is"+b.adjSet);
+//		//		b.adjSet.clear();
+//		//		//b.adjSet = new HashMap<Integer,Set<Integer>>();
+//		//		for(int n :adjSet.keySet()){
+//		//			if(adjSet.get(n)!=null){				
+//		//				for(int nc : adjSet.get(n)){
+//		//					if(matchNodes.contains(n) && matchNodes.contains(nc)){
+//		//						if(!b.adjSet.containsKey(n)){
+//		//							Set<Integer> temp = new HashSet<Integer>();
+//		//							temp.add(nc);
+//		//							b.adjSet.put(n, temp);
+//		//						}else
+//		//							if(b.adjSet.containsKey(n)){
+//		//								(b.adjSet.get(n)).add(nc);
+//		//
+//		//							}
+//		//					}
+//		//				}
+//		//			}
+//		//		}
+//		//out.println("the adjSet after trimming is "+ b.adjSet);
+//
+//		b.adjSet = new HashMap<Integer,Set<Integer>>();
+//		for(Map.Entry<Integer, Set<Integer>> entry : adjSet.entrySet()){
+//			for(int nc : entry.getValue()){
+//				if(matchNodes.contains(entry.getKey()) && matchNodes.contains(nc)){
+//					if(!b.adjSet.containsKey(entry.getKey())){
+//						Set<Integer> temp = new HashSet<Integer>();
+//						temp.add(nc);
+//						b.adjSet.put(entry.getKey(), temp);
+//					}else
+//						if(b.adjSet.containsKey(entry.getKey())){
+//							(b.adjSet.get(entry.getKey())).add(nc);
+//						}
+//				}
+//			}
+//
+//		}
+//		for(int v:clone.keySet()){
+//			if((clone.get(v)).isEmpty()){
+//				Set <Integer> temp = new HashSet<Integer>();
+//				clone.put(v, temp);
+//			}
+//		}		
+//		return clone;
+//
+//	}
 
 
 	/********************************************************************************
 	 * This is the method used for printing the result in the distributed format. This is basically the post processing phase.
+	 * @param The data graph.
+	 * @param All the balls, in this case a Map where K is the center and V is the ball.
+	 * @param The match Centers.
+	 * @return A set of Final set of candidate vertices which are passed as an argument for Induced SubGraph method. 
 	 */
 
 	public static Set<Integer> printRes(Graph g, Map<Integer,Ball> balls, Set<Integer> matchCenters){
@@ -398,7 +405,7 @@ public class SequentialTight {
 				t1 = System.currentTimeMillis();
 				postProcessingTime+=(t1-t0);
 			}
-			//System.out.println(nodeId + " " + g.getLabel(nodeId)+ " " + ballString + " " + isMatch);
+			System.out.println(nodeId + " " + g.getLabel(nodeId)+ " " + ballString + " " + isMatch);
 		}		
 		System.out.println();
 		System.out.println("******************************************************");
@@ -417,6 +424,7 @@ public class SequentialTight {
 	 * @param DataGraph
 	 * @param Query Graph
 	 * @param Dual Simulation Set
+	 * @return A New Graph object which is the match graph.
 	 */
 
 	public static Graph filterGraph(Graph g, Graph q, Map<Integer,Set<Integer>> simSet ){
@@ -522,8 +530,10 @@ public class SequentialTight {
 
 	}
 
-	/*
+	/****************************************************************************************
 	 * Checks whether a ball is subset or superset of any other ball and add its entry accordingly.
+	 * @param The ball as a string.
+	 * @return A boolean variable based on the condition.
 	 */
 
 	public static boolean checkInsertOfMatch(Set<String> str){
@@ -548,8 +558,8 @@ public class SequentialTight {
 		return isInsert;
 	}
 
-	/*
-	 * Just for debugging purposes
+	/*************************************************************************************************
+	 * A method to print the match centers. Just for debugging purposes. 
 	 */
 	public static void printMatch(int center, Map<Integer,Set<Integer>> mat){
 		System.out.println("\n\nMatch for ball centered at "+ center+": ");
@@ -564,7 +574,7 @@ public class SequentialTight {
 	 * @param query
 	 * @param clone - (Dual Sim Set)
 	 * @param ball
-	 * @return
+	 * @return 
 	 */
 	public static Map<Integer,Set<Integer>> getDualFilter(Graph query, Map<Integer,Set<Integer>> clone, Ball b){
 
@@ -736,11 +746,11 @@ public class SequentialTight {
 		System.out.println("READING THE GRAPHS.....");
 		System.out.println();
 		long readingStart = System.currentTimeMillis();
-//		Graph g = new Graph("/Users/Satya/Desktop/g.txt");
-//		Graph q = new Graph("/Users/Satya/Desktop/q.txt");		
+//		Graph g = new Graph("/Users/Satya/Desktop/graphs/syn-1M/syn-g-200l.txt");
+//		Graph q = new Graph("/Users/Satya/Desktop/graphs/syn-1M/80_1.2a_query.txt");		
 		
-		Graph g = new Graph("/Users/Satya/Desktop/a-g.txt");
-		Graph q = new Graph("/Users/Satya/Desktop/a-q.txt");
+		Graph g = new Graph("/Users/Satya/Desktop/g.txt");
+		Graph q = new Graph("/Users/Satya/Desktop/q.txt");
 		
 //		Graph g = new Graph("/Users/Satya/Desktop/thesis/satya-graphs/A-G-10k.txt");
 //		Graph q = new Graph("/Users/Satya/Desktop/thesis/satya-graphs/A-Q-10.txt");
@@ -769,10 +779,18 @@ public class SequentialTight {
 		System.out.println();
 		
 		long parentIdStart = System.currentTimeMillis();
-		g.getParentIndex1();
+		g.getParentIndex();
 		long parentIdStop = System.currentTimeMillis();
 		System.out.println("Time to find PARENT INDEX is: "+(parentIdStop-parentIdStart)+" ms" );
-		System.out.println();		
+		System.out.println();
+		
+		long labelIndexStart = System.currentTimeMillis();
+		g.getLabelIndex();
+		long labelIndexStop = System.currentTimeMillis();
+		System.out.println("Time to find LABEL INDEX is: "+(labelIndexStop-labelIndexStart)+" ms" );
+		System.out.println();
+		
+		
 		
 		long indexStop = System.currentTimeMillis();
 		System.out.println("Time to find ALL INDICES is: "+(indexStop-indexStart)+" ms" );
@@ -782,8 +800,7 @@ public class SequentialTight {
 		
 		System.out.println("Started SEQUENTIAL TIGHT:.....");
 		long tightStart = System.currentTimeMillis();
-		String sim = "strict";
-		SequentialTight.getTight(g, q,sim); // pass the data graph and the query graph as the arguments.
+		SequentialTight.getTight(g, q); // pass the data graph and the query graph as the arguments.
 		long tightStop = System.currentTimeMillis();				
 		System.out.println("The total Time for TIGHT SIMULATION is: "+(tightStop-tightStart)+" ms");
 		System.out.println();

@@ -24,12 +24,12 @@ public class Ball {
 
 
 	/*************************************************************
-	 * Default constructor for the class
+	 * Default constructor for the class.
 	 */
 	public Ball() {
 	}
-	/*
-	 * Constructor for creating the ball when the graph , center of the ball, and radius are passed
+	/**************************************************************
+	 * Constructor for creating the ball when the data graph , center of the ball, and radius are passed.
 	 *  
 	 */
 	public Ball(Graph graph, int center, int radius){
@@ -134,18 +134,30 @@ public class Ball {
 		return adjSet;
 
 	}
+
+	/****************************************************
+	 * Returns the children of a particular vertex in the ball.
+	 * @param  The id of the vertex.
+	 * @return A Set of Integers which are the children vertices of the given id. 
+	 */
+	
 	public Set<Integer> post(int id){
 		return adjSet.get(id);
 
 	}
+	/****************************************************
+	 * Returns the parents of a particular vertex in the ball.
+	 * @param  The id of the vertex.
+	 * @return A Set of Integers which are the parent vertices of the given id. 
+	 */
+	
 	public Set<Integer> pre(int id){
 		return parList.get(id);		
 	}	
 	
 	/****************************************************
-	 * A method to return the ball as a string
-	 * @paramthe adjSet of the ball
-	 * @return the ball in a string format
+	 * A method to return the ball as a string.
+	 * @return The ball in a string format.
 	 */
 	
 	public String getBallAsString() {
@@ -167,7 +179,7 @@ public class Ball {
 	
 	/****************************************************
 	 * A method to return the diameter of the ball
-	 * @return The diameter of the ball.
+	 * @return An integer which is the diameter of the ball.
 	 */
 	
 	public int getBallDiameter(){

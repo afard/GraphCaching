@@ -70,16 +70,13 @@ public class TestCaseA {
 		long dualFilterTime = 0;
 		Map<Integer, Ball> balls = new HashMap<Integer,Ball>();
 		Set<Integer> matchCenters = new HashSet<Integer>();
-		
-//		Set<Integer> centerList = new HashSet<Integer>(); // Doing this to find the vertices from query Selectivity 
-//		Integer[] cList = {2, 1, 6, 5, 4};
-//		centerList.addAll(Arrays.asList(cList));
+				
 		
 		// THIS EXPERIMENT IS WITHOUT USING FILTER GRAPH AND DUAL FILTER
 		
 		//for(int center:dualSimSet.get(q.selectivityCriteria(qMet.central()))){
-			for(int center:dualSimSet.get(0)){
-			//for(int center : centerList){
+			for(int center:dualSimSet.get(86)){
+			
 				long ballStartTime = System.currentTimeMillis();				
 				Ball ball = new Ball(subGraph,center,qDiameter); // BALL CREATION			
 				//System.out.println(ball.ballCenter+"--"+ball.getBallAsString());
@@ -252,8 +249,16 @@ public class TestCaseA {
 		// TODO Auto-generated method stub
 		System.out.println("TESTCASE A:");
 		System.out.println("========================================================================");
-		Graph g = new Graph("/Users/Satya/Desktop/a-g.txt");
-		Graph q = new Graph("/Users/Satya/Desktop/a-q.txt");
+		
+		Graph g = new Graph("/Users/Satya/Desktop/g.txt");
+		Graph q = new Graph("/Users/Satya/Desktop/q.txt");
+		
+//		Graph g = new Graph("/Users/Satya/Desktop/amz-g.txt");
+//		Graph q = new Graph("/Users/Satya/Desktop/amz-q-20.txt");
+		
+//		Graph g = new Graph("/Users/Satya/Desktop/graphs/syn-1M/syn-g-200l.txt");
+//		Graph q = new Graph("/Users/Satya/Desktop/graphs/syn-1M/100_1.2a_query.txt");
+		
 //		Graph g = new Graph("/Users/Satya/Desktop/thesis/satya-graphs/A-G-10k.txt");
 //		Graph q = new Graph("/Users/Satya/Desktop/thesis/satya-graphs/A-Q-10.txt");
 		g.getAllIds();
@@ -264,7 +269,7 @@ public class TestCaseA {
 		
 		//THIS IS WHERE WE PASS THE VERTEX SET THAT WE GET FROM THE CACHE (in our experiments we get it from SEQUENTIAL TIGHT)	
 		
-		Integer[] aList = {733390, 432361, 517057, 594889, 247655, 595382, 359173, 491793, 807983, 994539, 708136, 861151, 828237, 313050, 975878, 9335, 648733, 39555, 450173, 273133};		
+		Integer[] aList = {259126, 373867, 664664, 865141, 158714, 661000, 804941, 2295, 553553, 70554, 314187, 781718, 184663, 818361, 40722, 962925, 94483, 383886, 785061, 585114, 853178, 927990, 70789, 443178, 58407, 353347, 409269, 745559, 815353, 48276, 564440, 313461, 542426, 831819, 898727, 380635, 449230, 58485, 669446, 870205, 238185, 604335, 866214, 956279, 481967, 801568, 78702, 347729, 810313, 444170, 446564, 548820, 948119, 509258, 604839, 599204, 374677, 192479, 482390, 949556, 375667, 203773, 840539, 278607, 234776, 711183, 236525, 74319, 396806, 296502, 332734, 217324, 784263, 270246, 792074, 75948, 48574, 211233, 706841, 953073, 699341, 504621, 622191, 764357, 921822, 131172, 12261, 34657, 953126, 390700, 726186, 565900, 56591, 974639, 73297, 138090, 149995, 112541, 252573, 172378, 269107, 863667, 144595, 866448, 567595, 535274, 142046, 270094, 540352, 462483};		
 		Set<Integer> vertexSet = new HashSet<Integer>();
 		vertexSet.addAll(Arrays.asList(aList));
 		

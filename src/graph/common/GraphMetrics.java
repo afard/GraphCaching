@@ -84,7 +84,8 @@ public class GraphMetrics {
         } // for
     } // calcEcc
 
-    /** Visit the next vertex (at the head of queue 'qu'), mark it, compute the
+    /****************************************************************************
+     * Visit the next vertex (at the head of queue 'qu'), mark it, compute the
      *  path-length 'len' for each of its children and put them in the queue. 
      */
     private void visit() {
@@ -149,7 +150,7 @@ public class GraphMetrics {
         for(int i = 0;i<n;i++){
         	ecc_v[i] = ecc(i);
         }
-        int radius = ecc(0);
+        int radius = ecc_v[0];
         for(int i = 1; i < n; i++) 
             if(ecc_v[i]< radius){
             	radius = ecc_v[i];

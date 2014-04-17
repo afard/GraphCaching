@@ -8,9 +8,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Stack;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import org.javatuples.Pair;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 import static java.lang.System.out;
 
@@ -110,54 +119,54 @@ public class Graph {
 		} //catch
 	}
 
-	/*************************************************************
-	 * Gets a hashmap storing the values from the labels to the ids of the vertices
-	 * @return A hashmap where K is the label, and V is a set of all ids with K as their label 
-	 */
-	public Map<Integer, Set<Integer>> getLabelIndex() {
-		if (labelIndex == null) {
-			labelIndex = new HashMap<Integer, Set<Integer>>();
-			//int[] allIds = getAllIds();
-			getAllIds();
-			for (int i = 0; i < allIds.length; i++) {
-				if (labelIndex.get(getLabel(allIds[i])) == null) {
-					Set<Integer> vSet = new HashSet<Integer>();
-					vSet.add(allIds[i]);
-					labelIndex.put(getLabel(allIds[i]), vSet);
-				} else {
-					labelIndex.get(getLabel(allIds[i])).add(allIds[i]);
-				}
-			}
-		}
-		return labelIndex;
-	}
+	//	/*************************************************************
+	//	 * Gets a hashmap storing the values from the labels to the ids of the vertices
+	//	 * @return A hashmap where K is the label, and V is a set of all ids with K as their label 
+	//	 */
+	//	public Map<Integer, Set<Integer>> getLabelIndex() {
+	//		if (labelIndex == null) {
+	//			labelIndex = new HashMap<Integer, Set<Integer>>();
+	//			//int[] allIds = getAllIds();
+	//			getAllIds();
+	//			for (int i = 0; i < allIds.length; i++) {
+	//				if (labelIndex.get(getLabel(allIds[i])) == null) {
+	//					Set<Integer> vSet = new HashSet<Integer>();
+	//					vSet.add(allIds[i]);
+	//					labelIndex.put(getLabel(allIds[i]), vSet);
+	//				} else {
+	//					labelIndex.get(getLabel(allIds[i])).add(allIds[i]);
+	//				}
+	//			}
+	//		}
+	//		return labelIndex;
+	//	}
 
-	/*************************************************************
-	 * Gets an adjacency list representation of the parents of vertices
-	 * @return A hashmap where K is the vertex id, and V is a set of all parent ids for K
-	 */
-	public Map<Integer, Set<Integer>> getParentIndex() {
-
-		if (parentIndex == null) {
-			parentIndex = new HashMap<Integer, Set<Integer>>();
-			for (int id = 0 ; id < allIds.length ; id++){
-				Set<Integer> pSet = new HashSet<Integer>();
-				for (int i = 0; i < vertices.length; i++) {
-					if (vertices[i] != null) {
-						for (int j = 1; j < vertices[i].length; j++) {
-							//System.out.println("**"+vertices[i].length);
-							if (vertices[i][j] == id) {
-								pSet.add(i);
-							}
-						}
-					}
-				}
-
-				parentIndex.put(id, pSet);
-			}
-		}
-		return parentIndex;
-	}
+	//	/*************************************************************
+	//	 * Gets an adjacency list representation of the parents of vertices
+	//	 * @return A hashmap where K is the vertex id, and V is a set of all parent ids for K
+	//	 */
+	//	public Map<Integer, Set<Integer>> getParentIndex() {
+	//
+	//		if (parentIndex == null) {
+	//			parentIndex = new HashMap<Integer, Set<Integer>>();
+	//			for (int id = 0 ; id < allIds.length ; id++){
+	//				Set<Integer> pSet = new HashSet<Integer>();
+	//				for (int i = 0; i < vertices.length; i++) {
+	//					if (vertices[i] != null) {
+	//						for (int j = 1; j < vertices[i].length; j++) {
+	//							//System.out.println("**"+vertices[i].length);
+	//							if (vertices[i][j] == id) {
+	//								pSet.add(i);
+	//							}
+	//						}
+	//					}
+	//				}
+	//
+	//				parentIndex.put(id, pSet);
+	//			}
+	//		}
+	//		return parentIndex;
+	//	}
 	/*************************************************************
 	 * Gets the Map of vertex and its outgoing edges for all vertices in the graph
 	 * 
@@ -487,19 +496,19 @@ public class Graph {
 		}
 	}
 
-	/*************************************************************
-	 * Get the label of all the vertices in the ball
-	 * @param the ball which is a Map of vertices and their outgoing edges 
-	 * @param the parent graph
-	 * @return A map which of vertices and their corresponding labels
-	 */
-	public Map<Integer,Integer> getBallLabels(Map<Integer,Set<Integer>> ball, Graph g){
-		Map<Integer,Integer> ballLabels = new HashMap<Integer,Integer>();
-		for(int id:ball.keySet()){
-			ballLabels.put(id, g.getLabel(id)); 
-		}
-		return ballLabels;
-	}
+	//	/*************************************************************
+	//	 * Get the label of all the vertices in the ball
+	//	 * @param the ball which is a Map of vertices and their outgoing edges 
+	//	 * @param the parent graph
+	//	 * @return A map which of vertices and their corresponding labels
+	//	 */
+	//	public Map<Integer,Integer> getBallLabels(Map<Integer,Set<Integer>> ball, Graph g){
+	//		Map<Integer,Integer> ballLabels = new HashMap<Integer,Integer>();
+	//		for(int id:ball.keySet()){
+	//			ballLabels.put(id, g.getLabel(id)); 
+	//		}
+	//		return ballLabels;
+	//	}
 
 	//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	/********************************************************************************
@@ -516,7 +525,7 @@ public class Graph {
 		getChildIndex();
 		getLabelIndex();	
 		for(int cen: Centers){			
-			ratio = (double) (childIndex.get(cen).size() / labelIndex.get(getLabel(cen)).size());
+			ratio = (double) (childIndex.get(cen).size()) / (double)(labelIndex.get(getLabel(cen)).size());
 			if(max<ratio){
 				max = ratio;
 				index = cen;
@@ -525,7 +534,7 @@ public class Graph {
 		return index;
 	}
 	/********************************************************************************
-	 * Method to Print a Graph
+	 * Method to Print a Graph which prints the indices of the graph.
 	 */
 
 	public void print(){
@@ -552,11 +561,11 @@ public class Graph {
 	}
 
 	/********************************************************************************
-	 * Method to obtain a INDUCED SUBGRAPH from the dataGraph.
+	 * Auxiliary method to obtain an INDUCED SUBGRAPH from the dataGraph.
 	 * @param Set of Vertices to be input as the candidate vertices.
 	 * 
 	 */
-	public Graph inducedSubgraph(Set<Integer> set){
+	public Graph inducedSubgraph1(Set<Integer> set){
 		Map<Integer,Set<Integer>> adjSet = new HashMap<Integer,Set<Integer>>();
 		Map<Integer,Set<Integer>> parList = new HashMap<Integer,Set<Integer>>();
 		Map<Integer,Set<Integer>> newLabelIndex = new HashMap<Integer,Set<Integer>>();
@@ -630,10 +639,10 @@ public class Graph {
 
 	/********************************************************************************
 	 * Method to obtain a INDUCED SUBGRAPH from the dataGraph.
-	 * @param Set of Vertices to be input as the candidate vertices.
-	 * 
+	 * @param Set of Vertices which are the candidate vertices.
+	 * @return A Graph object which is the SugGraph induced by the input vertices.	 
 	 */
-	public Graph inducedSubgraph1(Set<Integer> set){
+	public Graph inducedSubgraph(Set<Integer> set){
 		Map<Integer,Set<Integer>> adjSet = new HashMap<Integer,Set<Integer>>();
 		Map<Integer,Set<Integer>> parList = new HashMap<Integer,Set<Integer>>();
 		Map<Integer,Set<Integer>> newLabelIndex = new HashMap<Integer,Set<Integer>>();
@@ -704,24 +713,25 @@ public class Graph {
 
 
 	/*************************************************************
-	 * Gets the Map of vertex and its incoming edges for all vertices in the graph
-	 * 
-	 * @return Map<Integer, Set<Integer>> A  Map of incoming from each vertex of the graph
+	 * Gets an adjacency list representation of the parents of vertices
+	 * @return A hashmap where K is the vertex id, and V is a set of all parent ids for K
 	 */
-	public Map<Integer, Set<Integer>> getParentIndex1() {
+	public Map<Integer, Set<Integer>> getParentIndex() {
 
 		//getAllIds();
 		parentIndex  = new HashMap<Integer, Set<Integer>> ();
 
-		for(int j=0;j<allIds.length;j++){
+		for(int j=0;j<childIndex.size();j++){
+			//for(int j=0;j<allIds.length;j++){
 			parentIndex.put(j, new HashSet<Integer>());
 		}
 		//System.out.println("the size of parent Index is: "+parentIndex.size());		
 
-		for(int i = 0;i<allIds.length;i++){		
-			
-			for(int j:post(i)){
-				//for(int j:childIndex.get(i)){
+		//for(int i = 0;i<allIds.length;i++){		
+		for(int i=0;i<childIndex.size();i++){
+			//for(int j:post(i)){
+
+			for(int j:childIndex.get(i)){
 				parentIndex.get(j).add(i);
 			}
 		}
@@ -731,7 +741,7 @@ public class Graph {
 	}
 
 	/*************************************************************
-	 * Test ChildIndex method
+	 * A Test ChildIndex method for tuning.
 	 */
 	public Map<Integer, Set<Integer>> getChildIndex1() {
 
@@ -750,62 +760,252 @@ public class Graph {
 		return childIndex;
 
 	}
+	/*************************************************************
+	 * Gets a hashmap storing the values from the labels to the ids of the vertices
+	 * @return A hashmap where K is the label, and V is a set of all ids with K as their label 
+	 */
+	public Map<Integer, Set<Integer>> getLabelIndex() {
+		if (labelIndex == null) {
+			labelIndex = new HashMap<Integer, Set<Integer>>();
+			//int[] allIds = getAllIds();
+			//			getAllIds();
+			//			for (int i = 0; i < allIds.length; i++) {
+			for (int i = 0; i < childIndex.size(); i++) {
+				if (labelIndex.get(getLabel(i)) == null) {
+					Set<Integer> vSet = new HashSet<Integer>();
+					vSet.add(i);
+					labelIndex.put(getLabel(i), vSet);
+				} else {
+					labelIndex.get(getLabel(i)).add(i);
+				}
+			}
+		}
+		return labelIndex;
+	}
 
-	
+	/********************************************************************************
+	 * Get the Graph Signature, which is a list of pairs of vertex labels of the edges. 
+	 * @return A List of Pairs of Integers where each pair constitute the vertex labels of an edge in the graph.
+	 */
+
+	public List<Pair<Integer,Integer>> getSignature(){
+
+		List<Pair<Integer,Integer>> sig = new ArrayList<Pair<Integer,Integer>>();
+
+		for(int i = 0;i<allIds.length;i++){
+
+
+			for(int j : childIndex.get(i)){
+
+				Pair p = new Pair<Integer,Integer>(getLabel(i),getLabel(j));
+				sig.add(p);
+
+			}
+
+		}	
+		return sig;		
+	}
+
+	/**********************************************************************
+	 * Auxiliary method which gives the Undirected version of a Graph.
+	 * 
+	 * @return The undirected version of the Graph, which is an adjacency list representation of the graph, 
+	 * 		   in this case a Map where K is a vertex and V is set of all edges both incoming and outgoing. 
+	 */
+	public Map<Integer,Set<Integer>> getUndirected(){
+		Map<Integer,Set<Integer>> undirectedG =  new HashMap<Integer, Set<Integer>>();
+		int n = allIds.length;
+		for(int i = 0; i < n ; i++) {
+			Set<Integer> aSet = new HashSet<Integer>();
+			undirectedG.put(i, aSet);
+		}
+
+		for(int i = 0; i < n ; i++) {
+			for(int j = 1; j < vertices[i].length; j++) { // the first int is the lable
+				if(vertices[i][j] >= n) {
+					System.out.println("Error: the input graph structure is not complete");
+				}
+				undirectedG.get(i).add(vertices[i][j]);
+				undirectedG.get(vertices[i][j]).add(i);
+			} // for
+		}
+		return undirectedG;
+
+	}
+
+	/**********************************************************************
+	 * The Main method which gets the Undirected version of a Graph.
+	 * 
+	 * @return The undirected version of the Graph, essentially a new Graph object.
+	 */
+	public Graph getUndirectedGraph(){
+		Map<Integer,Set<Integer>> adjList =  new HashMap<Integer, Set<Integer>>();
+		int n = allIds.length;
+		for(int i = 0; i < n ; i++) {
+			Set<Integer> aSet = new HashSet<Integer>();
+			adjList.put(i, aSet);
+		}
+
+		for(int i = 0; i < n ; i++) {
+			for(int j = 1; j < vertices[i].length; j++) { // the first int is the lable
+				if(vertices[i][j] >= n) {
+					System.out.println("Error: the input graph structure is not complete");
+				}
+				adjList.get(i).add(vertices[i][j]);
+				adjList.get(vertices[i][j]).add(i);
+			} // for
+		}
+		//System.out.println(adjList);
+		Graph undirGraph = new Graph();
+		undirGraph.childIndex = adjList;
+		undirGraph.parentIndex = undirGraph.getParentIndex();
+		undirGraph.labelIndex = getLabelIndex();
+		return undirGraph;
+
+	}
+
+	/********************************************************************************
+	 * 
+	 * @param The original graph from which the Polytree is to be found.
+	 * @param center
+	 * @return The Graph Object which is a Polytree extracted from the original graph.
+	 */
+
+	public Graph getPolytree(Graph g, int center){
+		// ***** This is BFS traversal. ******** 
+		Map<Integer,Set<Integer>> adjList = new HashMap<Integer, Set<Integer>>();
+		int n = g.allIds.length;
+		boolean[] visited = new boolean[n];
+
+		for(int i = 0; i < n; i++){
+			adjList.put(i, new HashSet<Integer>());
+		}
+		Graph ug = g.getUndirectedGraph();
+
+		Queue<Integer> q = new LinkedList<Integer>();
+
+		q.add(center);
+		visited[center] = true;
+		while(!q.isEmpty()){
+			int node = q.poll();
+			System.out.println("The visited node is "+node);
+			for(int child : ug.childIndex.get(node)){
+				if(!visited[child]){
+					visited[child] = true;
+					q.add(child);
+					adjList.get(node).add(child);
+
+				}
+
+			}
+		}
+
+		Map<Integer,Set<Integer>> newAdj = new HashMap<Integer, Set<Integer>>();
+		for(int i = 0; i < n; i++){
+			newAdj.put(i, new HashSet<Integer>());
+		}
+		
+		// ***** FIXING THE EDGE DIRECTIONS *****
+
+		for(int i = 0 ; i<adjList.size(); i++){
+			for(int j:adjList.get(i)){
+				if(g.childIndex.get(i).contains(j)){
+					newAdj.get(i).add(j);
+					//newAdj.get(i).add(j);
+				}
+				else if (!g.childIndex.get(i).contains(j)) {
+					newAdj.get(j).add(i);
+
+
+				}
+			}
+		}
+
+
+		System.out.println(adjList);
+		System.out.println();
+		System.out.println(newAdj);
+
+		Graph polyTree  = new Graph();
+		polyTree.childIndex = newAdj;
+		polyTree.parentIndex = polyTree.getParentIndex();
+		polyTree.labelIndex = g.labelIndex;
+
+		return polyTree; 
+
+	}
+
 
 
 
 	public static void main (String[] args) {
 		System.out.println("***** STARTED *****");
 		System.out.println();
-		Graph g = new Graph("/Users/Satya/Desktop/g.txt");		
+		//Graph g = new Graph("/Users/Satya/Desktop/datagraph.txt");
+		Graph g = new Graph("/Users/Satya/Desktop/testGraph.txt");
 
 		g.getAllIds();
-
-		long start0 = System.currentTimeMillis();
-
-		g.getParentIndex1();
-				for(Entry<Integer, Set<Integer>> entry: g.parentIndex.entrySet()){
-					System.out.println(entry.getKey()+" ---> "+entry.getValue());
-				}		
-		long stop0 = System.currentTimeMillis();
-		System.out.println("Time to find parent index 1 is: "+(stop0-start0)+" ms" );
-
-
-//		long start = System.currentTimeMillis();
-//		
-//		for(Entry<Integer, Set<Integer>> entry: g.parentIndex.entrySet()){
-//			System.out.println(entry.getKey()+" ---> "+entry.getValue());
-//		}	
-//		long stop = System.currentTimeMillis();
-//		System.out.println("Time to find parent Index 2 is: "+(stop-start)+" ms" );
-//		System.out.println();
-
-		//		long start1 = System.nanoTime();			
-		//		System.out.println("the children are: "+g.childIndex.get(49999));
-		//		long stop1 = System.nanoTime();
-		//		System.out.println("Time to find through indices is: "+(stop1-start1)+" nanosecs" );
-
 		g.getChildIndex();
-		g.getLabelIndex();
-				System.out.println("The size of Original Graph is: "+ g.allIds.length+" nodes");
-				System.out.println();
-				Integer[] aList = {3, 2, 1, 10, 0, 5, 4, 9, 13, 14, 11, 12};		
-				Set<Integer> vertexSet = new HashSet<Integer>();
-				vertexSet.addAll(Arrays.asList(aList));
-				long findSubGraphStart = System.currentTimeMillis();
-				System.out.println("vertexSet: "+vertexSet);
-		
-				Graph subGraph = g.inducedSubgraph1(vertexSet);
-				
-				long findSubGraphStop = System.currentTimeMillis();
-				
-				System.out.println("Time to find INDUCED SUBGRAPH: "+(findSubGraphStop-findSubGraphStart)+"ms");
-				System.out.println();
-				System.out.println("The size of Induced SubGraph is: "+subGraph.childIndex.size()+" nodes");
-				System.out.println();
-				System.out.println("***** DONE *****");
-				subGraph.print();
+		//System.out.println(g.childIndex);
+		//
+		//		long start0 = System.currentTimeMillis();
+		//
+		//		//g.getLabelIndex();
+		//		//g.getParentIndex();
+		////				for(Entry<Integer, Set<Integer>> entry: g.parentIndex.entrySet()){
+		////					//System.out.println(entry.getKey()+" ---> "+entry.getValue());
+		////				}		
+		//		long stop0 = System.currentTimeMillis();
+		//		System.out.println("Time to find PARENT index 0 is: "+(stop0-start0)+" ms" );
+		//		System.out.println();
+		//		System.out.println();
+		//		
+		//		
+		//		
+		//		long start10 = System.currentTimeMillis();
+		//		//g.getLabelIndex1();
+		//		g.getParentIndex1();
+		////				for(Entry<Integer, Set<Integer>> entry: g.parentIndex.entrySet()){
+		////					//System.out.println(entry.getKey()+" ---> "+entry.getValue());
+		////				}		
+		//		long stop10 = System.currentTimeMillis();
+		//		System.out.println("Time to find PARENT index 1 is: "+(stop10-start10)+" ms" );
+		//
+		//
+		////		long start = System.currentTimeMillis();
+		////		
+		////		for(Entry<Integer, Set<Integer>> entry: g.parentIndex.entrySet()){
+		////			System.out.println(entry.getKey()+" ---> "+entry.getValue());
+		////		}	
+		////		long stop = System.currentTimeMillis();
+		////		System.out.println("Time to find parent Index 2 is: "+(stop-start)+" ms" );
+		////		System.out.println();
+		//
+		//		//		long start1 = System.nanoTime();			
+		//		//		System.out.println("the children are: "+g.childIndex.get(49999));
+		//		//		long stop1 = System.nanoTime();
+		//		//		System.out.println("Time to find through indices is: "+(stop1-start1)+" nanosecs" );
+		//
+		////		g.getChildIndex();
+		////		g.getLabelIndex();
+		//				System.out.println("The size of Original Graph is: "+ g.allIds.length+" nodes");
+		//				System.out.println();
+		//				Integer[] aList = {3, 2, 1, 10, 0, 5, 4, 9, 13, 14, 11, 12};		
+		//				Set<Integer> vertexSet = new HashSet<Integer>();
+		//				vertexSet.addAll(Arrays.asList(aList));
+		//				long findSubGraphStart = System.currentTimeMillis();
+		//				System.out.println("vertexSet: "+vertexSet);
+		//		
+		//				Graph subGraph = g.inducedSubgraph1(vertexSet);
+		//				
+		//				long findSubGraphStop = System.currentTimeMillis();
+		//				
+		//				System.out.println("Time to find INDUCED SUBGRAPH: "+(findSubGraphStop-findSubGraphStart)+"ms");
+		//				System.out.println();
+		//				System.out.println("The size of Induced SubGraph is: "+subGraph.childIndex.size()+" nodes");
+		//				System.out.println();
+		//				System.out.println("***** DONE *****");
+		//				subGraph.print();
 
 		//		Ball b = new Ball(subGraph,0,1);			//(Ball( graph, center, radius)
 		//		System.out.println();
@@ -848,6 +1048,19 @@ public class Graph {
 		//		System.out.println("the BALL is "+ball.getBallAsString());
 		////		System.out.println();
 		////		System.out.println("The parent Index is "+g.parentIndex);
+
+		//		for(Entry<Integer, Integer> entry: g.getSignature().entrySet()){
+		//		System.out.println(entry.getKey()+" ---> "+entry.getValue());
+		//	}
+		//		Graph uG = g.getUndirectedGraph();
+		//		uG.print();
+		Graph g1 = new Graph("/Users/Satya/Desktop/testGraph1.txt");
+		g1.getAllIds();
+		g1.getChildIndex();
+		
+		(g.getPolytree(g1, 5)).print();
+
+
 		System.out.println("DONE");
 	}
 }
