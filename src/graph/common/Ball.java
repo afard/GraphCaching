@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 /*************************************************************
- * @author Satya
+ * @author Satya , Arash
  *This is the class that holds the ball. 
  */
 public class Ball {

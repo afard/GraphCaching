@@ -271,15 +271,14 @@ public class test {
 		System.out.println(m1.equals(m));
 
 
-		Graph g = new Graph("/Users/Satya/Desktop/testGraph1.txt");
-		g.getAllIds();
-		g.getChildIndex();
-		Map<Integer,Set<Integer>> uG = g.getUndirected();
-		//System.out.println("the UNDIRECTED VERSION IS --- "+uG);
+		Graph q1 = new Graph("/Users/Satya/Desktop/testGraph1.txt");
+		q1.getAllIds();
+		q1.getChildIndex();
+		
 		test t = new test();
 		//t.getDfs1(uG, 1);
 		//t.fixPoly(g, t.getDfs(g, 0));
-		t.getBfs(g, 5);
+		t.getBfs(q1, 5);
 		//t.getDfs(g, 2);
 	}
 }

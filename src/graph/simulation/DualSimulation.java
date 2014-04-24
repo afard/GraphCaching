@@ -1,6 +1,6 @@
 
 /**************************************************************************
- * @author Satya
+ * @author Satya,Arash
  *
  */
 // *************Code available in Git*********//test
@@ -98,49 +98,4 @@ public class DualSimulation{
 		
 		return sim;
 	}	
-
-	public static void main (String[] args) {
-
-		System.out.println("Started.....");
-		System.out.println();
-		long readingStart = System.currentTimeMillis();
-
-		//		Graph g = new Graph("/Users/Satya/Desktop/g.txt");
-		//		Graph q = new Graph("/Users/Satya/Desktop/q.txt");
-
-		//		Graph g = new Graph("/Users/Satya/Desktop/thesis/satya-graphs/B-G-1M-100L-500D.txt");
-		//		Graph q = new Graph("/Users/Satya/Desktop/thesis/satya-graphs/B-Q-10N-5L.txt");
-
-		Graph g = new Graph("/Users/Satya/Desktop/datagraph.txt");
-		Graph q = new Graph("/Users/Satya/Desktop/query.txt");
-
-
-		long readingStop = System.currentTimeMillis();
-		System.out.println("Time to read the Graphs: "+(readingStop-readingStart)+" ms");
-		System.out.println();
-
-		long start = System.currentTimeMillis();
-		g.getAllIds();
-		System.out.println("g.getAllIds()");
-		g.getParentIndex();
-		System.out.println("g.getParentIndex1()");
-		g.getLabelIndex();
-		//System.out.println("g.getLabelIndex()");
-		g.getChildIndex();
-		System.out.println("g.getChildIndex()");
-		//q.getAllIds();
-		long stop = System.currentTimeMillis();
-		System.out.println("Time to calculate from the Graphs: "+(stop-start)+" ms");
-		System.out.println();
-
-
-		DualSimulation sim = new DualSimulation();		
-
-		long dualStart = System.currentTimeMillis();
-		System.out.println("The DUAL SIM set is "+sim.getDual(g,q));
-		System.out.println();
-		long dualStop = System.currentTimeMillis();
-		System.out.println("Time to compute DUAL SIM is : "+(dualStop-dualStart)+" ms");
-		System.out.println("DONE");
-	}
 }
