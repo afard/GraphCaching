@@ -1,26 +1,25 @@
 package graph.common;
 
+import graph.simulation.DualSimulation;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+
 /*************************************************************
  * @author Satya , Arash
  *This is the class that holds the ball. 
  */
-public class Ball {
+public class Ball extends SmallGraph {
 	public Set<Integer> nodesInBall = null;
 	public Set<Integer> borderNodes = null;
-	public Map<Integer, Set<Integer>> adjSet = null;
-	Map<Integer, Set<Integer>> parList = null;	
-	public Map<Integer,Integer> ballLabelIndex = null;
-	Map<Integer, Integer> distance = null;	// This is  LinkedHashMap similar to the queue used in BFS
 	public int ballCenter = 0;
+	public int ballRadius = 0;
 
 
 	/*************************************************************
@@ -28,224 +27,202 @@ public class Ball {
 	 */
 	public Ball() {
 	}
+	
 	/**************************************************************
 	 * Constructor for creating the ball when the data graph , center of the ball, and radius are passed.
 	 *  
 	 */
-	public Ball(Graph graph, int center, int radius){
-		if(nodesInBall == null && borderNodes == null && adjSet == null && parList == null && distance == null && ballLabelIndex ==null){
-			adjSet = new HashMap<Integer, Set<Integer>> ();
-			parList = new HashMap<Integer, Set<Integer>> ();
-			borderNodes = new HashSet<Integer>();
-			nodesInBall = new HashSet<Integer>();
-			
-			//linked Hash Map in this case functions as a QUEUE.
-			//Used a structure to hold the vertex-depth pair.			
-			distance = new LinkedHashMap<Integer, Integer> (); 															
-			ballLabelIndex = new HashMap<Integer,Integer>();
-		}
-		int depth = 0;
-		ballCenter = center;	
-		distance.put(center, 0);
+	public Ball(SmallGraph graph, int center, int radius){
+		ballCenter = center;
+		ballRadius = radius;
+		graph.buildParentIndex();
+		borderNodes = new HashSet<Integer>();
+		nodesInBall = new HashSet<Integer>();			
+
+        this.len = new HashMap<Integer, Integer>();
+		int distance = 0;
+		this.qu.clear();
+		qu.add(center);
+		len.put(center, 0);
 		nodesInBall.add(center);
-//		adjSet.put(center, graph.post(center));		
-//		parList.put(center, graph.pre(center));//Uncomment all these and comment the ones below if the graph is not populated
-		if(graph.childIndex==null)graph.getChildIndex();
-		adjSet.put(center, graph.childIndex.get(center));
+
+		// finding nodesInBall and borderNodes
+		while(! qu.isEmpty()) {			
+			int nextVertex = qu.poll();
+			distance = len.get(nextVertex);
+			if(distance == radius) { 		// nextVertex is a border node
+				nodesInBall.add(nextVertex);
+				borderNodes.add(nextVertex);
+			} else {
+				distance ++;
+				// the underlying undirected graph should be used
+				if(graph.vertices.get(nextVertex) != null) {
+					for (int c : graph.vertices.get(nextVertex)) { // for each child of nextVertex
+						if(!this.nodesInBall.contains(c)) {  // it means that this vertex is not visited yet
+							nodesInBall.add(c);
+							len.put(c, distance);            // distance from center to c                
+							qu.add(c);                       // put child c in the queue	        			
+						} // if
+					} // for
+				} //if
+
+				if(graph.parentIndex.get(nextVertex) != null) {
+					for (int p : graph.parentIndex.get(nextVertex)) { // for each parent of vertex id
+						if(!this.nodesInBall.contains(p)) {  // it means that this vertex is not visited yet
+							nodesInBall.add(p);
+							len.put(p, distance);            // distance from center to c                
+							qu.add(p);                       // put child c in the queue	        			
+						} // if
+					} // for
+				} //if
+			} // ifelse
+		} // while
 		
-		if(graph.parentIndex==null)graph.getParentIndex();
-		parList.put(center, graph.parentIndex.get(center));
+		SmallGraph subgraph = GraphUtils.inducedSubgraph(graph, nodesInBall);
+		this.vertices = subgraph.vertices;
+		this.labels = subgraph.labels;
 		
-		while (!distance.isEmpty()){
-			Entry<Integer, Integer> vdPair = distance.entrySet().iterator().next();			
-			distance.remove(vdPair.getKey());
-			int nextV = vdPair.getKey();
-			depth = vdPair.getValue();
-			
-			if(vdPair.getValue() == radius){				
-				borderNodes.add(vdPair.getKey());
-			}			
-			else{
-				//Set<Integer> children = graph.post(nextV);
-				if(graph.childIndex==null)graph.getChildIndex();
-				Set<Integer> children = graph.childIndex.get(nextV);
-				//Set<Integer> parents = graph.pre(nextV);
-				//if(graph.parentIndex==null)graph.getParentIndex();
-				Set<Integer> parents = graph.parentIndex.get(nextV);
-				
-
-				for(int child:children){
-					if(!nodesInBall.contains(child)){
-					
-						nodesInBall.add(child);
-						distance.put(child, depth+1);						
-					}
-				}
-
-				for(int parent:parents){
-					if(!nodesInBall.contains(parent)){						
-						nodesInBall.add(parent);
-						distance.put(parent, depth+1);						
-					}
-				}
-			}
-		}		
-		for (int node:nodesInBall){
-			
-			ballLabelIndex.put(node, graph.getLabel(node));
-			Set<Integer> children = graph.childIndex.get(node);
-			Set<Integer> parents = graph.parentIndex.get(node);
-			if(!adjSet.containsKey(node)){
-				Set<Integer> tempAdj = new HashSet<Integer>();
-				adjSet.put(node,tempAdj );				
-			}
-			if(!parList.containsKey(node)){
-				Set<Integer> tempPar = new HashSet<Integer>();
-				parList.put(node, tempPar);
-			}
-			for(int child:children){
-				if(nodesInBall.contains(child)){
-					if(!parList.containsKey(child)){
-						Set<Integer> pre = new HashSet<Integer>();
-						pre.add(node);
-						parList.put(child, pre);
-					}else 
-						if (parList.containsKey(child)){
-							(parList.get(child)).add(node);
-						}
-				}			
-			}
-			for(int parent :parents){
-				if(nodesInBall.contains(parent)){
-					if(!adjSet.containsKey(parent)){
-						Set<Integer> post = new HashSet<Integer>();
-						post.add(node);
-						adjSet.put(parent,post);
-					}else			
-						if(adjSet.containsKey(parent)){
-							(adjSet.get(parent)).add(node);
-						}
-				}
-			}
-		}		
+	} // Ball
+	
+	public void clear() {
+		this.vertices.clear();
+		this.labels.clear();
+		this.parentIndex = null;
+		
+		this.borderNodes.clear();
+		this.nodesInBall.clear();
 	}
 	
-	public Map<Integer, Set<Integer>> getBall(){
-		return adjSet;
+    /** Perform dual simulation onto the ball and refine the vertices of the ball
+     *  @param query  the query graph Q(U, D, k)
+     *  @param dualSim    mappings from a query vertex u_q to { graph vertices v_g }
+     *  @return			returns false when the ball becomes empty; true otherwise
+     */ 
+    public boolean dualFilter (SmallGraph query, Map<Integer, Set<Integer>> dualsim) {
+    	return dualFilter(query, dualsim, false);
+    }
+    
+    /** Perform dual simulation on this ball.
+     *  @param query  	the query graph Q(U, D, k)
+     *  @param dualSim  mappings from a query vertex u_q to { graph vertices v_g }
+     *  @param strong	when it is false, we assume that ball is created based on the dual match result graph
+     *  @return			returns false when the ball becomes empty; true otherwise
+     */ 
+    public boolean dualFilter (SmallGraph query, Map<Integer, Set<Integer>> dualsim, boolean strong) {
+    	if(strong) { // projecting dualsim on the ball
+    		this.nodesInBall.retainAll(DualSimulation.nodesInSimSet(dualsim));
+    		if(!nodesInBall.contains(ballCenter)) {
+    			this.clear();
+    			return false;
+    		}
+    		Iterator<Integer> it = this.vertices.keySet().iterator();
+    		while(it.hasNext()) {
+    			int v = it.next();
+    			if(! nodesInBall.contains(v)) {
+    				it.remove();
+    				vertices.remove(v);
+    			} else {
+    				if(vertices.get(v) != null)
+    					vertices.get(v).retainAll(nodesInBall);
+    			}
+    		}
+    	} //if
+    	
+    	// making a copy of dualsim and keeping only the vertices of the ball
+    	Map<Integer, Set<Integer>> localDualSim = new HashMap<Integer, Set<Integer>>(dualsim.size());
+    	for(int u : dualsim.keySet()) {
+    		Set<Integer> localMatch = new HashSet<Integer>(dualsim.get(u));
+    		localMatch.retainAll(nodesInBall);
+    		localDualSim.put(u, localMatch);
+    	}
+    	
+    	// filtered dualsim on the ball
+    	localDualSim = DualSimulation.dualSimSetHelper(this, query, localDualSim);
+    	if(localDualSim.isEmpty()) {
+    		this.clear();
+    		return false;
+    	} //if
+    	// it is valid only if it still contains the center
+    	this.nodesInBall.clear();
+    	this.borderNodes.clear();
+    	nodesInBall.addAll(DualSimulation.nodesInSimSet(localDualSim));
+    	if(! nodesInBall.contains(ballCenter) ) {
+    		this.clear();
+    		return false;
+    	} //if
 
-	}
-
-	/****************************************************
-	 * Returns the children of a particular vertex in the ball.
-	 * @param  The id of the vertex.
-	 * @return A Set of Integers which are the children vertices of the given id. 
-	 */
+        // Finding max perfect subgraph
+    	SmallGraph maxPG = DualSimulation.getResultMatchGraph(this, query, localDualSim);
+    	this.vertices = maxPG.vertices;
+    	this.labels = maxPG.labels;
+    	
+    	return true;
+    } //dualFilter
 	
-	public Set<Integer> post(int id){
-		return adjSet.get(id);
-
-	}
-	/****************************************************
-	 * Returns the parents of a particular vertex in the ball.
-	 * @param  The id of the vertex.
-	 * @return A Set of Integers which are the parent vertices of the given id. 
-	 */
-	
-	public Set<Integer> pre(int id){
-		return parList.get(id);		
-	}	
-	
+    /**
+     * Checks if this ball contains all the vertices of another ball
+     * @param anotherBall
+     * @return true when it contains another ball; false otherwise
+     */
+    public boolean contains(Ball anotherBall) {
+    	if(this.nodesInBall.containsAll(anotherBall.nodesInBall)) {
+    		for(int vertex : anotherBall.nodesInBall) {
+    			if(! this.post(vertex).containsAll(anotherBall.post(vertex)))
+    				return false;
+    		}
+    		return true;
+    	} else
+    		return false;
+    }
+    
 	/****************************************************
 	 * A method to return the ball as a string.
 	 * @return The ball in a string format.
 	 */
-	
 	public String getBallAsString() {
         StringBuilder s = new StringBuilder();
-        if (adjSet != null) {
-            List<Integer> keys = new ArrayList<Integer> (adjSet.keySet());
+        if (vertices != null) {
+            List<Integer> keys = new ArrayList<Integer> (vertices.keySet());
             Collections.sort (keys);
-            for (Integer i : keys) {
+            for (int i : keys) {
                 s.append(i + "->[");
-                List<Integer> values = new ArrayList<Integer> (adjSet.get(i));
+                List<Integer> values = new ArrayList<Integer> (vertices.get(i));
                 Collections.sort (values);
-                for (Integer j: values) 
+                for (int j: values) 
                     s.append(j+",");
                 s.append("],");
             }
         }
         return s.toString();
-    }
+    } //getBallAsString
 	
-	/****************************************************
-	 * A method to return the diameter of the ball
-	 * @return An integer which is the diameter of the ball.
-	 */
-	
-	public int getBallDiameter(){
-
-		int n = nodesInBall.size()+1;
-		int[][] path = new int[n][n];
-		for(int u:nodesInBall){
-			for(int v:nodesInBall){
-				if(u!=v){
-					if(post(u).contains(v)){
-						path[v][u] = 1;
-						path[u][v] = 1;
-					}
-				}
-			}
-		}
-		int diameter = 0;
-		for(int k:nodesInBall){
-			for(int i:nodesInBall){
-				for(int j:nodesInBall){
-					if(i!=j){
-						if(path[i][k] * path[k][j]!=0){
-							if((path[i][k]+path[k][j]<path[i][j]) ||path[i][j]==0 ){
-								path[i][j] = (path[i][k]+path[k][j]);
-							}
-							diameter = Math.max(path[i][j], diameter);
-						}
-					}
-				}
-			}
-		}
-
-		return diameter;
-
+	public String toString() {
+		StringBuilder s = new StringBuilder("-----------\n");
+		s.append("Center: " + ballCenter + "\n");
+		s.append("Nodes in ball: " +nodesInBall + "\n");
+		for (int u : this.labels.keySet()) {
+			s.append(u + " (" + labels.get(u) + ") ");
+			if(this.vertices.get(u) != null)
+				s.append(vertices.get(u) + "\n");
+		} // for
+		//s.append("Border nodes: " + borderNodes + "\n");
+		s.append("-----------\n");
+		return(s.toString());
 	}
 	
-	public static void main (String[] args) {
-		Graph g = new Graph("/Users/Satya/Desktop/datagraph.txt");
-		g.getChildIndex();
-		g.getAllIds();
-		g.getParentIndex();
-		//Ball ball = new Ball(g,4,3);
-		int[] centers = {5,6,8};
-		for(int i:centers){
-			System.out.println(i+"---"+(new Ball(g,i,1)).nodesInBall);
-			System.out.println();
-		}
+	/**
+	 * Test main method
+	 * @param args
+	 */
+	public static void main (String[] args) throws Exception {
+		SmallGraph sg = new SmallGraph("exampleGraphs/G_tight1.txt");
+		Ball b = new Ball(sg, 8, 2);
 		
-//		Graph g1 = new Graph("/Users/Satya/Desktop/testGraph.txt");
-//		g1.getChildIndex();
-//		g1.getAllIds();
-//		g1.getParentIndex();
-//		Ball b = new Ball(g1,0,1);
-//		System.out.println(b.getBallAsString());
+		System.out.println(b.getBallAsString());
+		System.out.println();
+		System.out.println(b);
 		
-//		System.out.println("BALL DIAMETER = "+ball.getBallDiameter());
-//		System.out.println();
-//		System.out.println(ball.getBall());
-//		System.out.println();
-//		System.out.println("THE BORDER NODES ARE: "+ ball.borderNodes);
-//		System.out.println();
-//		System.out.println("THE LABELS OF THE NODES ARE: "+ ball.ballLabelIndex);
-//		System.out.println();
-//		System.out.println(ball.getBallAsString());
-		
-		
-		
+		System.out.println("Diameter of the ball:" + b.getDiameter());
+		System.out.println("Radius of the ball:" + b.getRadius());
 	}
 }
