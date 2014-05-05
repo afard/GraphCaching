@@ -18,12 +18,14 @@ public class Graph {
 	/*************************************************************
 	 * The main data structures that holds all the graph information.
 	 */
-	private Set<Integer>[] adj = null; // the adjacency list of the graph
+	private int[][] adj = null; // the adjacency list of the graph
 	private int[] label = null; // the array of labels for vertices
 
 	private Map<Integer, Set<Integer>> labelIndex = null;
 
 	private Set<Integer>[] parent = null; // it remains null by default
+	
+	private Set<Integer>[] childIndex = null; // it will be filled gradually
 
 	/*************************************************************
 	 * Auxiliary constructor
@@ -31,7 +33,8 @@ public class Graph {
 	 */
 	@SuppressWarnings("unchecked")
 	public Graph(int size) {
-		this.adj = (Set<Integer>[]) new Set<?>[size];
+		this.adj = new int[size][];
+		this.childIndex = (Set<Integer>[]) new Set<?>[size];
 		this.label = new int[size];
 	}
 
@@ -66,16 +69,6 @@ public class Graph {
 				if (val > max) {
 					max = val;
 				}
-//				for(int i=2; i < splits.length; i++) {
-//					val = Integer.parseInt((splits[i]));
-//					if (val < 0) {
-//						System.err.println("vertex id must be an integer bigger than 0");
-//						System.exit(-1);
-//					}
-//					if (val > max) {
-//						max = val;
-//					}
-//				}
 			}
 
 			// Close the input stream
@@ -83,8 +76,10 @@ public class Graph {
 			in.close();
 
 			// initialize the main array (the vertex id starts from 0)   
-			this.adj = (Set<Integer>[]) new Set<?>[++max];
+			this.adj = new int[++max][];
+			this.childIndex = (Set<Integer>[]) new Set<?>[max];
 			this.label = new int[max];
+			System.out.println("Number of vertices in " + filePath + ": " + max);
 
 			fstream = new FileInputStream(filePath);
 			in = new DataInputStream(fstream);
@@ -95,12 +90,12 @@ public class Graph {
 
 				String[] splits = strLine.split(" ");
 				int index = Integer.parseInt(splits[0]); // the first integer is the id of the vertex
-				this.adj[index] = new HashSet<Integer>(splits.length - 2);
+				this.adj[index] = new int[splits.length - 2];
 
 				this.label[index] =  Integer.parseInt(splits[1]); // the label of the vertex
-				
+
 				for (int i = 2; i < splits.length; i++) { // the id of the children of the vertex
-					this.adj[index].add(Integer.parseInt(splits[i]));
+					this.adj[index][i - 2] = Integer.parseInt(splits[i]);
 				}
 			} //while
 
@@ -196,7 +191,7 @@ public class Graph {
 	 * @param id Id of the vertex
 	 * @param outgoing An array that corresponds to the outgoing edges
 	 */
-	public void setNeighbors(int id, Set<Integer> outgoing) throws Exception {
+	public void setNeighbors(int id, int[] outgoing) throws Exception {
 		if (id > adj.length -1) {
 			throw new Exception("id: " + id + "is out of range");
 		}
@@ -214,7 +209,14 @@ public class Graph {
 		if (adj[id] == null)
 			return new HashSet<Integer>();
 		
-		return adj[id];
+		if (this.childIndex[id] == null) {
+			Set<Integer> children = new HashSet<Integer>(adj[id].length);
+			for (int i = 0; i < adj[id].length; i++)
+				children.add(adj[id][i]);
+			this.childIndex[id] = children;
+		}
+		
+		return this.childIndex[id];
 	}
 
 	/*************************************************************
@@ -245,9 +247,13 @@ public class Graph {
 			System.out.print(i + " (");
 			System.out.print(label[i] + ") ");
 			if (adj[i] != null) {
-				System.out.print(adj[i]);
+				System.out.print("[");
+				int j = 0;
+				for (; j < adj[i].length - 1; j++)
+					System.out.print(adj[i][j] + ", ");
+				if (adj[i].length != 0) System.out.print(adj[i][j]);
+				System.out.println("]");
 			}
-			System.out.println();
 		}
 	}
 
