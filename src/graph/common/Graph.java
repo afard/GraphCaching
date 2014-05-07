@@ -11,7 +11,7 @@ import java.util.Set;
 
 /** 
  *  It is a class for large graphs. The vertex id of vertices must be sequential numbers. 
- *  @author Usman Nisar, Arash Fard, Satya.
+ *  @author Arash Fard, Satya.
  */
 public class Graph {
 
@@ -61,7 +61,7 @@ public class Graph {
 
 			while ((strLine = br.readLine()) != null) {
 
-				String[] splits = strLine.split(" ");
+				String[] splits = strLine.split("\\s+");
 				int val = Integer.parseInt((splits[0]));
 				if (val < 0) {
 					throw new Exception("vertex id must be an integer bigger than 0");
@@ -88,7 +88,7 @@ public class Graph {
 			//Read File Line By Line
 			while ((strLine = br.readLine()) != null) { // each line belongs to one vertex
 
-				String[] splits = strLine.split(" ");
+				String[] splits = strLine.split("\\s+");
 				int index = Integer.parseInt(splits[0]); // the first integer is the id of the vertex
 				this.adj[index] = new int[splits.length - 2];
 

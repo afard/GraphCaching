@@ -1,3 +1,6 @@
+/**  
+* @author Arash Fard, Satya
+*/
 package test;
 
 import graph.common.*;
@@ -38,6 +41,19 @@ public class TestCaseA {
 
 		System.out.println("The number of vertices in the data graph: " + dataGraph.getNumVertices());
 		System.out.println("The number of vertices in the query graph: " + queryGraph.getNumVertices());
+		int queryStatus = queryGraph.isPolytree();
+		switch (queryStatus) {
+			case -1: System.out.println("The query Graph is disconnected");
+					 System.exit(-1);
+					 break;
+			case  0: System.out.println("The query Graph is connected but not a polytree");
+					 break;
+			case  1: System.out.println("The query Graph is a polytree");
+					 break;
+			default: System.out.println("Undefined status of the query graph");
+			 		 System.exit(-1);
+			 		 break;
+		}
 		System.out.println();
 		
 		// 2) The tight simulation is performed and its time, t_noCache, is measured
@@ -130,6 +146,6 @@ public class TestCaseA {
 		System.out.println("************ The ratio ********************");
 		System.out.println("t_noCache / t_withCache = " + t_noCache / t_withCache);
 
-	} //testCaseA
+	} //main
 	
 } //class

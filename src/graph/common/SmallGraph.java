@@ -72,7 +72,7 @@ public class SmallGraph {
 
 			while ((strLine = br.readLine()) != null) {
 
-				String[] splits = strLine.split(" ");
+				String[] splits = strLine.split("\\s+");
 				int val = Integer.parseInt((splits[0]));
 				if (val < 0) {
 					throw new Exception("vertex id must be an integer bigger than 0");
@@ -97,7 +97,7 @@ public class SmallGraph {
 			//Read File Line By Line
 			while ((strLine = br.readLine()) != null) { // each line belongs to one vertex
 
-				String[] splits = strLine.split(" ");
+				String[] splits = strLine.split("\\s+");
 				int index = Integer.parseInt(splits[0]); // the first integer is the id of the vertex
 				this.vertices.put(index, new HashSet<Integer>(splits.length - 2));
 
@@ -381,6 +381,64 @@ public class SmallGraph {
 		return this.labelIndex.get(label);
 	}
 
+	/********************************************************************************
+	 * Tests if the graph is connected and polytree
+	 * @return -1 when it is not connected, 0 when it is connected but not polytree, 1 when it is a polytree
+	 */
+	public int isPolytree() {
+		int nVertices = this.getNumVertices();
+		buildParentIndex();
+		boolean cyclic = false;
+
+		// keeps track of visited vertices. 'w' not observed, 'g' observed, 'b' traversed
+		Map<Integer, Character> visited = new HashMap<Integer, Character>(nVertices);
+		int nTraversed = 0; // number of traversed vertices
+		// initializing the visited map
+		int center = 0;
+		for(int id : labels.keySet()){
+			visited.put(id, 'w');
+			center = id;
+		}
+		
+		// ***** This is BFS traversal on undirected ********
+		qu.clear(); 
+
+		qu.add(center);
+		visited.put(center, 'g');
+		
+		while(!qu.isEmpty()){
+			int node = qu.poll();
+			if(vertices.get(node) != null) {
+				for(int child : vertices.get(node)){
+					char childColor = visited.get(child);
+					if(childColor == 'w'){
+						visited.put(child, 'g');
+						qu.add(child);
+					} else if(childColor == 'g') {
+						cyclic = true;
+					}
+				} //for
+			} //if
+			if(parentIndex.get(node) != null) {
+				for(int parent : parentIndex.get(node)){
+					int parentColor = visited.get(parent);
+					if(parentColor == 'w'){
+						visited.put(parent, 'g');
+						qu.add(parent);
+					} else if (parentColor == 'g') {
+						cyclic = true;
+					}
+				} //for
+			} //if
+			visited.put(node, 'b');
+			nTraversed ++;
+		} //while
+
+		if(nTraversed < nVertices) return -1;
+		else if (cyclic) return 0;
+		else return 1;
+	} // getPolytree
+
 	/*************************************************************
 	 * Dumps the graph on console. Useful for debugging
 	 */
@@ -410,6 +468,20 @@ public class SmallGraph {
 	public static void main(String[] args) throws Exception {
 		SmallGraph q = new SmallGraph("exampleGraphs/40_1.2a_query.txt");
 		System.out.println("The center: " + q.getSelectedCenter());
+		int queryStatus = q.isPolytree();
+		switch (queryStatus) {
+			case -1: System.out.println("The query Graph is disconnected");
+					 System.exit(-1);
+					 break;
+			case  0: System.out.println("The query Graph is connected but not a polytree");
+					 break;
+			case  1: System.out.println("The query Graph is a polytree");
+					 break;
+			default: System.out.println("Undefined status of the query graph");
+			 		 System.exit(-1);
+			 		 break;
+		}
+
 	} //main
 	
 } // class

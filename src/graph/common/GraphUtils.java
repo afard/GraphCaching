@@ -147,6 +147,21 @@ public class GraphUtils {
         SmallGraph pt2 = getPolytree(graph, 5);
         System.out.println("The polytree from center 5:");
         pt2.display();
+        
+		int queryStatus = pt2.isPolytree();
+		switch (queryStatus) {
+			case -1: System.out.println("It is disconnected");
+					 System.exit(-1);
+					 break;
+			case  0: System.out.println("It is connected but not a polytree");
+					 break;
+			case  1: System.out.println("It is a polytree");
+					 break;
+			default: System.out.println("Undefined status of the graph");
+			 		 System.exit(-1);
+			 		 break;
+		}
+
     } // main
 	
 }

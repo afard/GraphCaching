@@ -21,19 +21,35 @@ public class TightSimulation {
 	 * @return All the subgraphs; i.e., the set of balls in this case
 	 */
 	public static Set<Ball> getTightSimulation(Graph dataGraph, SmallGraph query) {
+		long startTime, stopTime;
 		Set<Ball> resultBalls = new HashSet<Ball>();
 		
 		//********** FINDING THE "DUAL SIMULATION" STEP ********** //
+		startTime = System.currentTimeMillis();
 		Map<Integer,Set<Integer>> dualSimSet = DualSimulation.getDualSimSet(dataGraph, query);
+		stopTime = System.currentTimeMillis();
+		System.out.println("- INSIDE getTightSimulation()- time for dualSimSet: " + (stopTime - startTime) + " ms");
 		if(dualSimSet.isEmpty()){
 			System.out.println("No Dual Match"); 
 			return resultBalls;		
 		}
+		
+		// ********** finding the number of vertices in the dualSimSet **************//
+		// *** This step is not a part of the algorithm, and is done only for extracting information
+		startTime = System.currentTimeMillis();
+		Set<Integer> nVdualSimSet = DualSimulation.nodesInSimSet(dualSimSet);
+		stopTime = System.currentTimeMillis();
+		System.out.println("- INSIDE getTightSimulation()- the number of vertices in the dualSimSet: " + nVdualSimSet.size());
+		System.out.println("- INSIDE getTightSimulation()- the time for this extra step: " + (stopTime - startTime) + " ms");
 
 		// ********** FINDING THE MATCH GRAPH STEP **************//
+		startTime = System.currentTimeMillis();
 		SmallGraph newGraph = DualSimulation.getResultMatchGraph(dataGraph, query, dualSimSet);	
+		stopTime = System.currentTimeMillis();
+		System.out.println("- INSIDE getTightSimulation()- time for dualMatchGraph: " + (stopTime - startTime) + " ms");
 
 		// ********** FINDING QUERY Radius and selected center ********** //
+		startTime = System.currentTimeMillis();
 		int qRadius = query.getRadius();
 		int qCenter = query.getSelectedCenter();
 
@@ -47,6 +63,8 @@ public class TightSimulation {
 			if(found)
 				resultBalls.add(ball);
 		} //for
+		stopTime = System.currentTimeMillis();
+		System.out.println("- INSIDE getTightSimulation()- time for ball creation and filtering: " + (stopTime - startTime) + " ms");
 
 		return resultBalls;
 	}
