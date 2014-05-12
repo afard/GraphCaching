@@ -75,7 +75,7 @@ public class Ball extends SmallGraph {
 						} // if
 					} // for
 				} //if
-			} // ifelse
+			} // if-else
 		} // while
 		
 		SmallGraph subgraph = GraphUtils.inducedSubgraph(graph, nodesInBall);

@@ -4,9 +4,12 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -458,7 +461,23 @@ public class SmallGraph {
 	 * Method to Print a Graph
 	 */
 	public String toString(){
-		return ("The Graph has " + this.getNumVertices() + " vertices.");
+		StringBuilder result = new StringBuilder();
+		List<Integer> uList = new ArrayList<Integer>(labels.keySet());
+		Collections.sort(uList);
+		for(int u : uList) {
+			result.append(u); // the vertex id
+			result.append(" " + labels.get(u)); // the vertex label
+			if(vertices.containsKey(u)) {	// the vertex neighbors
+				List<Integer> vList = new ArrayList<Integer>(vertices.get(u));
+				Collections.sort(vList);
+				for(int v : vList) { 
+					result.append(" " + v);
+				} //for
+			} //if
+			result.append("\n");
+		} //for
+		
+		return result.toString();
 	}
 	
 	/**
@@ -481,6 +500,8 @@ public class SmallGraph {
 			 		 System.exit(-1);
 			 		 break;
 		}
+		
+		System.out.println(q);
 
 	} //main
 	

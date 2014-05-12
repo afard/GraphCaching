@@ -100,7 +100,7 @@ public class BatchTest {
 				SmallGraph inducedSubgraph = GraphUtils.inducedSubgraph(dataGraph, dualSimSet);
 				stopTime = System.currentTimeMillis();
 				long t_subgraph = stopTime - startTime;
-				System.out.println("The number of vertices in the dualSimSet of polytree: " + dualSimSet.size());
+				System.out.println("\nThe number of vertices in the dualSimSet of polytree: " + dualSimSet.size());
 //				System.out.println("Spent time to find the induced subgraph of the dualSimSet: " + t_subgraph + " ms");
 //				System.out.println();
 
@@ -117,7 +117,7 @@ public class BatchTest {
 				
 				stopTime = System.currentTimeMillis();
 				long t_store = stopTime - startTime;
-				System.out.println("Spent time to store the <polytree, inducedSubgraph> in the cache: " + t_store + " ms");
+//				System.out.println("Spent time to store the <polytree, inducedSubgraph> in the cache: " + t_store + " ms");
 
 				System.out.println();
 				long t_cache = t_polytree + t_dualSim + t_subgraph + t_store;
