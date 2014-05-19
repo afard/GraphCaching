@@ -10,6 +10,7 @@ import graph.simulation.TightSimulation;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,10 +28,10 @@ public class TestCaseB {
 		}
 		long startTime, stopTime;
 		
-		startTime = System.currentTimeMillis();
+		startTime = System.nanoTime();
 		Graph dataGraph = new Graph(args[0]);
-		stopTime = System.currentTimeMillis();
-		System.out.println("Spent time to load the data graph: " + (stopTime - startTime) + " ms");
+		stopTime = System.nanoTime();
+		System.out.println("Spent time to load the data graph: " + (double)(stopTime - startTime)/1000000 + " ms");
 		
 		File file = new File(args[2]);
 		// if file does not exists, then create it
@@ -38,8 +39,8 @@ public class TestCaseB {
 		FileWriter fw = new FileWriter(file.getAbsoluteFile());			
 		BufferedWriter bw = new BufferedWriter(fw);	
 
-		bw.write("querySize\t isPolytree\t t_noCache\t nSubgraphs\t nVertices\t t_polytree\t t_dualSim\t dualSimSet.size()\t "
-				+ "t_subgraph\t nVertices\t ratio\n");
+		bw.write("queryFile\t querySize\t isPolytree\t t_noCache\t nSubgraphs\t nVertices\t t_polytree\t t_dualSim\t dualSimSet.size()\t "
+				+ "t_subgraph\t t_withCache\t nVertices\t ratio\n");
 		StringBuilder fileContents = new StringBuilder();
 
 		File dirQ = new File(args[1]);
@@ -55,15 +56,16 @@ public class TestCaseB {
 		}
 
 		for(File query : queries) {
-			System.out.println("Processin " + query.getAbsolutePath());
+			System.out.println("Processing " + query.getAbsolutePath());
 			System.out.println("_______________________________________________");
 			
 			// The queryGraph is read from file
-			startTime = System.currentTimeMillis();
+			startTime = System.nanoTime();
 			SmallGraph queryGraph = new SmallGraph(query.getAbsolutePath());
-			stopTime = System.currentTimeMillis();
-			System.out.println("Spent time to load the query graph: " + (stopTime - startTime) + " ms");
-			fileContents.append(queryGraph.getNumVertices());
+			stopTime = System.nanoTime();
+			System.out.println("Spent time to load the query graph: " + (double)(stopTime - startTime)/1000000 + " ms");
+			fileContents.append(query.getName());
+			fileContents.append("\t" + queryGraph.getNumVertices());
 
 			int queryStatus = queryGraph.isPolytree();
 			switch (queryStatus) {
@@ -83,70 +85,70 @@ public class TestCaseB {
 			System.out.println();
 
 			// The tight simulation is performed and its time, t_noCache, is measured
-			startTime = System.currentTimeMillis();
+			startTime = System.nanoTime();
 			Set<Ball> tightResults = TightSimulation.getTightSimulation(dataGraph, queryGraph);
-			tightResults = TightSimulation.filterMatchGraphs(tightResults);
-			stopTime = System.currentTimeMillis();
+//			tightResults = TightSimulation.filterMatchGraphs(tightResults);
+			stopTime = System.nanoTime();
 			long t_noCache = stopTime - startTime;
-			System.out.println("The total time of tight simulation without cache, 't_noCache': " + t_noCache + " ms");
-			fileContents.append("\t " + t_noCache);
+			System.out.println("The total time of tight simulation without cache, 't_noCache': " + (double)t_noCache/1000000 + " ms");
+			fileContents.append("\t " + (double)t_noCache/1000000);
 
 			System.out.println("The number of subgraph results: " + tightResults.size());
 			fileContents.append("\t " + tightResults.size());
-			int nVertices = 0;
+			Set<Integer> vSet = new HashSet<Integer>();
 			for(Ball b : tightResults)
-				nVertices += b.nodesInBall.size();
-			System.out.println("The total number of the vertices in all balls: " + nVertices);
-			fileContents.append("\t " + nVertices);
+				vSet.addAll(b.nodesInBall);
+			System.out.println("The total number of the vertices in all balls: " + vSet.size());
+			fileContents.append("\t " + vSet.size());
 			System.out.println();
 
 			// The polytree of the queryGraph is created
-			startTime = System.currentTimeMillis();
+			startTime = System.nanoTime();
 			int center = queryGraph.getSelectedCenter();
 			SmallGraph polytree = GraphUtils.getPolytree(queryGraph, center);
-			stopTime = System.currentTimeMillis();
+			stopTime = System.nanoTime();
 			long t_polytree = stopTime - startTime;
-			System.out.println("Spent time to create the polytree: " + t_polytree + " ms");
-			fileContents.append("\t " + t_polytree);
+			System.out.println("Spent time to create the polytree: " + (double)t_polytree/1000000 + " ms");
+			fileContents.append("\t " + (double)t_polytree/1000000);
 			System.out.println();
 
 			// The dualSimSet of the polytree is found
-			startTime = System.currentTimeMillis();
+			startTime = System.nanoTime();
 			Map<Integer, Set<Integer>> dualSim = DualSimulation.getDualSimSet(dataGraph, polytree);
-			stopTime = System.currentTimeMillis();
+			stopTime = System.nanoTime();
 			long t_dualSim = stopTime - startTime;
-			System.out.println("Spent time to find the dualSimSet of the polytree: " + t_dualSim + " ms");
-			fileContents.append("\t " + t_dualSim);
+			System.out.println("Spent time to find the dualSimSet of the polytree: " + (double)t_dualSim/1000000 + " ms");
+			fileContents.append("\t " + (double)t_dualSim/1000000);
 			System.out.println();
 
 			// The induced subgraph of the dualSimSet is found
-			startTime = System.currentTimeMillis();
+			startTime = System.nanoTime();
 			Set<Integer> dualSimSet = DualSimulation.nodesInSimSet(dualSim);
 			SmallGraph inducedSubgraph = GraphUtils.inducedSubgraph(dataGraph, dualSimSet);
-			stopTime = System.currentTimeMillis();
+			stopTime = System.nanoTime();
 			long t_subgraph = stopTime - startTime;
 			System.out.println("The number of vertices in the dualSimSet of polytree: " + dualSimSet.size());
 			fileContents.append("\t " + dualSimSet.size());
-			System.out.println("Spent time to find the induced subgraph of the dualSimSet: " + t_subgraph + " ms");
-			fileContents.append("\t " + t_subgraph);
+			System.out.println("Spent time to find the induced subgraph of the dualSimSet: " + (double)t_subgraph/1000000 + " ms");
+			fileContents.append("\t " + (double)t_subgraph/1000000);
 			System.out.println();
 
 
 			// The result of tight simulation for queryGraph is retrieved from the cache and its time, t_withCache, is measured
-			startTime = System.currentTimeMillis();
+			startTime = System.nanoTime();
 			Set<Ball> tightResults_cache = TightSimulation.getTightSimulation(inducedSubgraph, queryGraph);
-			tightResults_cache = TightSimulation.filterMatchGraphs(tightResults_cache);
-			stopTime = System.currentTimeMillis();
+//			tightResults_cache = TightSimulation.filterMatchGraphs(tightResults_cache);
+			stopTime = System.nanoTime();
 			long t_withCache = stopTime - startTime;
-			System.out.println("The total time of tight simulation with cache, 't_withCache': " + t_withCache + " ms");
-			fileContents.append("\t " + t_withCache);
+			System.out.println("The total time of tight simulation with cache, 't_withCache': " + (double)t_withCache/1000000 + " ms");
+			fileContents.append("\t " + (double)t_withCache/1000000);
 
 			System.out.println("The number of subgraph results: " + tightResults_cache.size());
-			nVertices = 0;
+			vSet.clear();
 			for(Ball b : tightResults_cache)
-				nVertices += b.nodesInBall.size();
-			System.out.println("The total number of the vertices in all balls: " + nVertices);
-			fileContents.append("\t " + nVertices);
+				vSet.addAll(b.nodesInBall);
+			System.out.println("The total number of the vertices in all balls: " + vSet.size());
+			fileContents.append("\t " + vSet.size());
 			System.out.println();
 
 			System.out.println("************ The ratio ***************");

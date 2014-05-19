@@ -3,6 +3,9 @@ package graph.query;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 
 import graph.common.*;
@@ -36,7 +39,9 @@ public class QueryGenerator {
 			//System.out.println("center: " + center);
 			SmallGraph sg = GraphUtils.subGraphBFS(dataGraph, center, degree, nVertices);
 			if(sg.getNumVertices() == nVertices) {
-				print2File(sg, args[1] + "/queryN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
+//				print2File(sg, args[1] + "/subGN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
+				SmallGraph q = arrangeID(sg);
+				print2File(q, args[1] + "/queryN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
 				nCreatedQueries ++;
 			} //if
 		} //while
@@ -55,4 +60,29 @@ public class QueryGenerator {
 			bw.close();
 			System.out.println(fileName + " is written.");
 	} //print2File
+	
+	public static SmallGraph arrangeID(SmallGraph g) {
+		int nVertices = g.getNumVertices();
+		SmallGraph q = new SmallGraph(nVertices);
+		Map<Integer, Integer> vMap = new HashMap<Integer, Integer>(nVertices);
+		int counter = 0;
+		
+		for(int indexG : g.labels.keySet()) {
+			vMap.put(indexG, counter);			
+			q.labels.put(counter, g.labels.get(indexG));
+			counter ++;
+		} //for
+		
+		for(int indexG : g.labels.keySet()) {
+			if(g.post(indexG) != null) {
+				int indexQ = vMap.get(indexG);
+				q.vertices.put(indexQ, new HashSet<Integer>());
+				for(int child : g.post(indexG)) {
+					q.vertices.get(indexQ).add(vMap.get(child));
+				} // for
+			} //if
+		} //for
+		
+		return q;
+	} // arrangeID
 }

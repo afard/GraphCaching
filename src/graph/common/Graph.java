@@ -136,10 +136,10 @@ public class Graph {
 				parentIndex[id] = new HashSet<Integer>();
 			System.out.println("The sets are created!");
 			for (int id = 0; id < adj.length; id++) {
-//				if (adj[id] != null) {
+				if (adj[id] != null) {
 					for (int child : adj[id])
 						parentIndex[child].add(id);
-//				}
+				}
 			}
 		}
 	}
@@ -283,9 +283,14 @@ public class Graph {
 			return parentIndex[id];
 		}
 		
-		Set<Integer> par = new HashSet<Integer>(parent[id].length);
-		for(int i : parent[id])
-			par.add(i);
+		Set<Integer> par;
+		if(parent[id] != null) {
+			par = new HashSet<Integer>(parent[id].length);
+			for(int i : parent[id])
+				par.add(i);
+		} else {
+			par = new HashSet<Integer>();
+		}
 		
 		return par;
 	}

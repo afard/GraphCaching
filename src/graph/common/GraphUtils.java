@@ -181,7 +181,7 @@ public class GraphUtils {
 	 */
 	public static void storeInverseGraph(Graph g, String fileName) throws Exception {
 		System.out.println("Making the reverse graph");
-		g.label = null; // release memory
+//		g.label = null; // release memory
 		g.buildParentIndex();
 		
 		System.out.println("Writing the reverse graph");		
@@ -193,21 +193,63 @@ public class GraphUtils {
 		
 		StringBuilder reverseGraph = new StringBuilder();
 		int nVertices = g.getNumVertices();
-		g.adj = null; // release memory
+//		g.adj = null; // release memory
 		for(int u=0; u < nVertices; u++) {
 			reverseGraph.append(u);		// the id of the vertex
 //			reverseGraph.append(" " + g.getLabel(u)); // the label of the vertex
 			reverseGraph.append(" 0");
-			for(int v : g.pre(u)) {		// the parents of the vertex now becomes its children
-				reverseGraph.append(" " + v);
-			} //for
+			if(g.pre(u) != null)
+				for(int v : g.pre(u)) {		// the parents of the vertex now becomes its children
+					reverseGraph.append(" " + v);
+				} //for
 			reverseGraph.append("\n");
 			bw.write(reverseGraph.toString());				// write this line to buffer writer
 			reverseGraph.delete(0, reverseGraph.length());	// delete the contents of the StringBuilder
 		} //for
 		
-		bw.close();		
+		bw.close();
 	}
+	
+	public static void arrangeVertexID (String inputFile, String outputFile) throws Exception {
+		System.out.println("Reading the input graph");
+		Graph inG = new Graph(inputFile);
+		// we assume that any valid ID has a line to declare its label
+		int inG_nVertices = inG.getNumVertices();
+		int[] map = new int[inG_nVertices];
+		
+		int counter = 0;
+		for(int index=0; index < inG_nVertices; index++) {
+			if(inG.adj[index] != null) {
+				map[index] = counter;
+				counter ++;
+			} //if
+		} // for
+		
+		System.out.println("Writing the arranged graph");		
+		File file = new File(outputFile);
+		// if file does not exists, then create it
+		if (!file.exists()) file.createNewFile();
+		FileWriter fw = new FileWriter(file.getAbsoluteFile());			
+		BufferedWriter bw = new BufferedWriter(fw);
+		
+		StringBuilder outG = new StringBuilder();
+
+		for(int u=0; u < inG_nVertices; u++) {
+			if(inG.adj[u] != null) {
+				outG.append(map[u]);		// the id of the vertex
+				outG.append(" " + inG.getLabel(u)); // the label of the vertex
+				for(int v : inG.post(u)) {
+					outG.append(" " + map[v]);
+				} //for
+				outG.append("\n");
+				bw.write(outG.toString());				// write this line to buffer writer
+				outG.delete(0, outG.length());	// delete the contents of the StringBuilder
+			} //if
+		} //for
+		
+		bw.close();
+		
+	} //arrangeVertexID
 	
 	/**
 	 * Test main method
