@@ -37,9 +37,12 @@ public class QueryGenerator {
 			//System.out.println("center: " + center);
 			SmallGraph sg = GraphUtils.subGraphBFS(dataGraph, center, degree, nVertices);
 			if(sg.getNumVertices() == nVertices) {
-				sg.print2File(args[1] + "/subGN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
-//				SmallGraph q = arrangeID(sg);
-//				q.print2File(args[1] + "/queryN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
+				if(degree == 0)
+					sg.print2File(args[1] + "/subGN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
+				else {
+					SmallGraph q = arrangeID(sg);
+					q.print2File(args[1] + "/queryN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
+				}
 				nCreatedQueries ++;
 			} //if
 		} //while
