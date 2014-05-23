@@ -86,7 +86,10 @@ public class DualSimulation{
 		// relating the vertices of dataGraph to the vertices of query based on label match
 		for(int u : query.labels.keySet()) {
 			int label = query.labels.get(u);
+			// a copy of the vertices with the same label
 			Set<Integer> phi = new HashSet<Integer>(dataGraph.getVerticesLabeled(label));
+			if(phi.isEmpty())
+				return new HashMap<Integer, Set<Integer>>(); // a vertex without any candidate match
 			sim.put(u, phi);			
 		} //for
 		

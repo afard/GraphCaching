@@ -134,7 +134,7 @@ public class Graph {
 			parentIndex = (Set<Integer>[]) new Set<?>[adj.length];;
 			for (int id = 0 ; id < adj.length ; id++)
 				parentIndex[id] = new HashSet<Integer>();
-			System.out.println("The sets are created!");
+//			System.out.println("The sets are created!");
 			for (int id = 0; id < adj.length; id++) {
 				if (adj[id] != null) {
 					for (int child : adj[id])

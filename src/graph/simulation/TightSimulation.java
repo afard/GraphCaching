@@ -55,7 +55,8 @@ public class TightSimulation {
 
 		// ****** BALL CREATION STEP ********* //
 		Set<Integer> matchCenters = dualSimSet.get(qCenter);
-
+		System.out.println("- INSIDE getTightSimulation()- the number of match vertices: " + matchCenters.size());
+		
 		for(int center : matchCenters){
 			Ball ball = new Ball(newGraph, center, qRadius); // BALL CREATION
 			// ******** DUAL FILTER STEP  **********

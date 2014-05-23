@@ -28,7 +28,7 @@ public class FavoritQueryGenerator {
 		File[] graphFiles = dirG.listFiles();
 		Graph[] graphs = new Graph[graphFiles.length];
 		for(int i=0; i < graphFiles.length; i++)
-			graphs[i] = new Graph(graphFiles[i].getName());
+			graphs[i] = new Graph(graphFiles[i].getAbsolutePath());
 		
 		File dirQ = new File(args[1]);
 		if(!dirQ.isDirectory())
@@ -51,7 +51,9 @@ public class FavoritQueryGenerator {
 			//System.out.println("center: " + center);
 			SmallGraph sg = GraphUtils.subGraphBFS(dataGraph, center, degree, nVertices);
 			if(sg.getNumVertices() == nVertices) {
-				QueryGenerator.print2File(sg, args[1] + "/queryN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
+//				QueryGenerator.print2File(sg, args[1] + "/subGN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
+				SmallGraph q = QueryGenerator.arrangeID(sg);
+				q.print2File(args[1] + "/queryN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
 				nCreatedQueries ++;
 			} //if
 		} //while

@@ -1,8 +1,6 @@
 package graph.query;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -39,27 +37,14 @@ public class QueryGenerator {
 			//System.out.println("center: " + center);
 			SmallGraph sg = GraphUtils.subGraphBFS(dataGraph, center, degree, nVertices);
 			if(sg.getNumVertices() == nVertices) {
-//				print2File(sg, args[1] + "/subGN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
-				SmallGraph q = arrangeID(sg);
-				print2File(q, args[1] + "/queryN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
+				sg.print2File(args[1] + "/subGN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
+//				SmallGraph q = arrangeID(sg);
+//				q.print2File(args[1] + "/queryN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
 				nCreatedQueries ++;
 			} //if
 		} //while
 
 	} //main
-	
-	public static void print2File(SmallGraph q, String fileName) throws Exception {
-
-			File file = new File(fileName);
-			// if file does not exists, then create it
-			if (!file.exists()) file.createNewFile();
-			FileWriter fw = new FileWriter(file.getAbsoluteFile());			
-			BufferedWriter bw = new BufferedWriter(fw);
-			
-			bw.write(q.toString());
-			bw.close();
-			System.out.println(fileName + " is written.");
-	} //print2File
 	
 	public static SmallGraph arrangeID(SmallGraph g) {
 		int nVertices = g.getNumVertices();

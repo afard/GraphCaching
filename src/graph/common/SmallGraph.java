@@ -1,8 +1,11 @@
 package graph.common;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -350,6 +353,8 @@ public class SmallGraph {
 	 * @return A Set of Integers which are the children vertices of the given id. 
 	 */	
 	public Set<Integer> post(int id){
+		if(vertices.get(id) == null)
+			return new HashSet<Integer>();
 		return vertices.get(id);
 	}
 
@@ -381,7 +386,10 @@ public class SmallGraph {
 		if (labelIndex == null)
 			buildLabelIndex();
 
-		return this.labelIndex.get(label);
+		if(labelIndex.get(label) != null)
+			return this.labelIndex.get(label);
+		else
+			return new HashSet<Integer>();
 	}
 
 	/********************************************************************************
@@ -479,6 +487,25 @@ public class SmallGraph {
 		
 		return result.toString();
 	}
+	
+	/**
+	 * Writes the adjacency list of a graph to a file
+	 * @param q			the graph
+	 * @param fileName  the file name and path
+	 * @throws Exception
+	 */
+	public void print2File(String fileName) throws Exception {
+
+			File file = new File(fileName);
+			// if file does not exists, then create it
+			if (!file.exists()) file.createNewFile();
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());			
+			BufferedWriter bw = new BufferedWriter(fw);
+			
+			bw.write(this.toString());
+			bw.close();
+			System.out.println(fileName + " is written.");
+	} //print2File
 	
 	/**
 	 * Test main method
