@@ -354,7 +354,7 @@ public class SmallGraph {
 	 */	
 	public Set<Integer> post(int id){
 		if(vertices.get(id) == null)
-			return new HashSet<Integer>();
+			vertices.put(id, new HashSet<Integer>());
 		return vertices.get(id);
 	}
 
@@ -366,6 +366,8 @@ public class SmallGraph {
 	public Set<Integer> pre(int id){
 		if(parentIndex == null)
 			buildParentIndex();
+		if(parentIndex.get(id) == null)
+			parentIndex.put(id, new HashSet<Integer>());
 		return parentIndex.get(id);		
 	}	
 

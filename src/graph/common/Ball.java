@@ -131,13 +131,14 @@ public class Ball extends SmallGraph {
     	// making a copy of dualsim and keeping only the vertices of the ball
     	Map<Integer, Set<Integer>> localDualSim = new HashMap<Integer, Set<Integer>>(dualsim.size());
     	for(int u : dualsim.keySet()) {
-    		Set<Integer> localMatch = new HashSet<Integer>(dualsim.get(u));
-    		localMatch.retainAll(nodesInBall);
+    		Set<Integer> localMatch = new HashSet<Integer>(nodesInBall);
+    		localMatch.retainAll(dualsim.get(u));
     		localDualSim.put(u, localMatch);
     	}
     	
     	// filtered dualsim on the ball
-    	localDualSim = DualSimulation.dualSimSetHelper(this, query, localDualSim);
+//    	localDualSim = DualSimulation.dualSimSetHelper(this, query, localDualSim);
+    	localDualSim = DualSimulation.newDualSimSetHelper(this, query, localDualSim);
     	if(localDualSim.isEmpty()) {
     		this.clear();
     		return false;

@@ -20,7 +20,6 @@ import cache.CacheUtils;
 
 public class TestHit {
 	
-	private static final int MAX_QUERY_NO = 10000;
 	private static final int DEGREE_RATIO = 3;
 	/*
 	 * Randomly (but specific distribution) generate queries and store them in the cache
@@ -66,7 +65,7 @@ public class TestHit {
 		
 		int nSourceOptions = nPopularGraphs + 1; // number of sources for creating query
 		Random randSource = new Random();
-		int[] querySizes = {11,12,13,14,15,16,17,18,19,20}; // different available sizes for queries
+		int[] querySizes = {20,22,24,26,28,30,32,34,36,38}; // different available sizes for queries
 		Random randQuerySize = new Random();
 //		Random randDegree = new Random();
 		Random randCenter = new Random();
