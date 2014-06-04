@@ -32,7 +32,7 @@ public class SmallGraph {
 	public Map<Integer, Set<Integer>> parentIndex = null;  	// adjacency list of reversed graph (its population should be 
 															// 	checked before usage)
 	
-	private Map<Integer, Set<Integer>> labelIndex = null;   // a map from given label to the set of vertices with this label
+	public Map<Integer, Set<Integer>> labelIndex = null;   // a map from given label to the set of vertices with this label
     public Map<Integer, Integer> eccentricity = null;    	// eccentricity of the vertices
     // Auxiliary variables
     Queue<Integer> qu = new LinkedList<Integer> (); // a queue supporting BFS
@@ -50,6 +50,7 @@ public class SmallGraph {
     /**
      * Constructor
      * @param nVertices The number of vertices in the graph
+     * It is used when the number of vertices is known in advance
      */
     public SmallGraph(int nVertices) {
     	vertices = new HashMap<Integer, Set<Integer>>(nVertices);
@@ -123,6 +124,17 @@ public class SmallGraph {
 		} //catch
 	}
 
+	/**
+	 * creates a copy of this graph
+	 */
+	public SmallGraph clone() {
+		SmallGraph copyGraph = new SmallGraph(this.getNumVertices());
+		copyGraph.vertices.putAll(this.vertices);
+		copyGraph.labels.putAll(this.labels);
+		
+		return copyGraph;
+	} //clone
+	
 	/**
 	 * Builds Pattern Index for the SmallGraph
 	 */
@@ -452,6 +464,62 @@ public class SmallGraph {
 		else return 1;
 	} // getPolytree
 
+	/**
+	 * Connect a new vertex to one of the vertices of the graph
+	 * @param newVertex the id number of the new vertex
+	 * @param newLabel  the label of the new vertex
+	 * @param oldVertex the id number of the old vertex
+	 * @param edgeDirection 0 means an edge from newVertex to oldVertex, opposite otherwise
+	 */
+	public void connectNewVertex(int newVertex, int newLabel, int oldVertex, int edgeDirection) {
+		if(this.vertices.get(newVertex) != null) {
+			System.out.println("The vertex is already in the graph");
+			System.exit(-1);
+		} //if
+		
+		if(edgeDirection == 0) { //from newVertex to oldVertex
+			Set<Integer> vSet = new HashSet<Integer>();
+			vSet.add(oldVertex);
+			vertices.put(newVertex, vSet);
+			labels.put(newVertex, newLabel);
+			if(parentIndex != null) {
+				if(parentIndex.get(oldVertex) != null)
+					parentIndex.get(oldVertex).add(newVertex);
+				else {
+					Set<Integer> pSet = new HashSet<Integer>();
+					pSet.add(newVertex);
+					parentIndex.put(oldVertex, pSet);
+				}
+			}//if
+		} else { //from oldVertex to newVertex
+			if(vertices.get(oldVertex) == null) {
+				Set<Integer> vSet = new HashSet<Integer>();
+				vSet.add(newVertex);
+				vertices.put(oldVertex, vSet);
+			} else
+				vertices.get(oldVertex).add(newVertex);
+			
+			labels.put(newVertex, newLabel);
+			if(parentIndex != null) {
+				Set<Integer> pSet = new HashSet<Integer>();
+				pSet.add(oldVertex);
+				parentIndex.put(newVertex, pSet);
+			} //if				
+		}//if-else
+
+		if(labelIndex != null) {
+			if(labelIndex.get(newLabel) != null)
+				labelIndex.get(newLabel).add(newVertex);
+			else {
+				Set<Integer> lSet = new HashSet<Integer>();
+				lSet.add(newVertex);
+				parentIndex.put(newLabel, lSet);
+			}
+		}//if
+		eccentricity = null;
+
+	}//connectNewVertex
+	
 	/*************************************************************
 	 * Dumps the graph on console. Useful for debugging
 	 */

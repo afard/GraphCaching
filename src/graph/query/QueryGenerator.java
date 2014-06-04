@@ -31,6 +31,7 @@ public class QueryGenerator {
 		int nVertices = Integer.parseInt(args[3]);
 		int degree = Integer.parseInt(args[4]);
 		int nCreatedQueries = 0;
+		Map<Integer, Integer> nLabels2Frequency = new HashMap<Integer, Integer>();
 		
 		while(nCreatedQueries < nRequestedQueries) {
 			int center = rand.nextInt(dataGraph.getNumVertices());
@@ -42,10 +43,20 @@ public class QueryGenerator {
 				else {
 					SmallGraph q = arrangeID(sg);
 					q.print2File(args[1] + "/queryN" + nVertices + "D" + degree + "_" + nCreatedQueries + ".txt"); // print to file
+					q.buildLabelIndex();
+					int nLabels = q.labelIndex.size();
+					if(nLabels2Frequency.get(nLabels) == null)
+						nLabels2Frequency.put(nLabels, 1);
+					else
+						nLabels2Frequency.put(nLabels, nLabels2Frequency.get(nLabels) + 1);
 				}
 				nCreatedQueries ++;
 			} //if
 		} //while
+		
+		System.out.println("Frequency of label-range size in " + args[2] + " queries of size " + args[3] + ":");
+		for(int ls : nLabels2Frequency.keySet())
+			System.out.println(ls + " labels: " + nLabels2Frequency.get(ls));
 
 	} //main
 	

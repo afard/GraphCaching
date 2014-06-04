@@ -56,7 +56,7 @@ public class CacheUtils {
 	 * @return true if it is dual-cover-match; false otherwise
 	 */
 	public static boolean isDualCoverMatch(SmallGraph newQuery, SmallGraph polytree) {
-		Map<Integer, Set<Integer>> dualSim = DualSimulation.getDualSimSet(newQuery, polytree);
+		Map<Integer, Set<Integer>> dualSim = DualSimulation.getNewDualSimSet(newQuery, polytree);
 		Set<Integer> dualSimSet = DualSimulation.nodesInSimSet(dualSim);
 		int nVerticesInQ = newQuery.getNumVertices();
 		if(dualSimSet.size() == nVerticesInQ)

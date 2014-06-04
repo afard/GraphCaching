@@ -293,7 +293,17 @@ public class Graph {
 		}
 		
 		return par;
-	}
+	}//pre
+
+	public void stats() {
+		this.buildLabelIndex();
+		System.out.println("Number of vertices: " + label.length);
+		System.out.println("Number of labels: " + this.labelIndex.size());
+		System.out.println("Frequency of labels:");
+		for(int l : labelIndex.keySet()) {
+			System.out.println(l + ": " + labelIndex.get(l).size());
+		}
+	}//stats
 
 	/*************************************************************
 	 * Dumps the graph on console. Useful for debugging
@@ -313,7 +323,7 @@ public class Graph {
 			}
 		}
 	}
-
+	
 	/********************************************************************************
 	 * Method to Print a Graph
 	 */

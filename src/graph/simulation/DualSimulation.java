@@ -490,8 +490,8 @@ public class DualSimulation{
 	} //dualCardinalityFilter
 	
 	public static void main(String[] args) throws Exception {
-		Graph g = new Graph("exampleGraphs/G_tight1.txt");
-		SmallGraph q = new SmallGraph("exampleGraphs/Q_tight1.txt");
+		Graph g = new Graph("exampleGraphs/G2.txt");
+		SmallGraph q = new SmallGraph("exampleGraphs/G1.txt");
 		
 		Map<Integer, Set<Integer>> dualSim = getNewDualSimSet(g, q);
 		
