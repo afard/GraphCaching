@@ -411,7 +411,9 @@ public class DualSimulation{
 							newPhi.addAll(phiTemp);
 						} //while
 
-						if (newPhi.size() < relation.get(u_c).size()) alter = true;        // since newPhi is smaller than phi(u_c)           			
+						if (newPhi.size() < relation.get(u_c).size()) alter = true;        // since newPhi is smaller than phi(u_c)
+						if (newPhi.isEmpty())
+							return new HashMap<Integer, Set<Integer>>();
 						relation.put(u_c, newPhi); // newPhi is the refined set of the previous phi(u_c)
 					} //for
 				} //if

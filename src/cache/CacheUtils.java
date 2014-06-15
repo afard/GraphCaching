@@ -7,6 +7,7 @@ import graph.simulation.TightSimulation;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.javatuples.Pair;
@@ -76,7 +77,9 @@ public class CacheUtils {
 	 */
 	public static Set<Ball> ballExtractor(SmallGraph graph, SmallGraph polytree, Map<Integer, Set<Integer>> dualSim, int limit) {
 		Set<Ball> resultBalls = new HashSet<Ball>();
-		int bRadius = polytree.getDiameter();
+		if(dualSim.isEmpty()) return resultBalls;
+		
+		int bRadius = polytree.getDiameter(); // using diameter of the polytree to make sure that the ball will contain any isomorphic match
 		int qCenter = polytree.getSelectedCenter();
 		Set<Integer> matchCenters = dualSim.get(qCenter);
 		
@@ -99,12 +102,52 @@ public class CacheUtils {
 		Set<Ball> resultBalls = new HashSet<Ball>();
 		
 		for(Ball b : balls) {
-			Set<Ball> resultB = TightSimulation.getNewTightSimulation(b, query, limit);
-			resultBalls.addAll(resultB);
+			
+//			Set<Ball> resultB = TightSimulation.getNewTightSimulation(b, query, limit);
+			Map<Integer,Set<Integer>> dualSimSet = DualSimulation.getNewDualSimSet(b, query);
+			if(! dualSimSet.isEmpty()) {
+				Ball resultB = b.clone();
+				if (resultB.dualFilter(query, dualSimSet))
+					resultBalls.add(resultB);
+			}
 			if(resultBalls.size() >= limit) break;
 		} //for
 		
 		return resultBalls;
 	}//tightSimBalls
 	
+	/**
+	 * Shuffles the elements of an array
+	 * @param array the input array
+	 * @return the shuffled array
+	 */
+	public static <E> E[] RandomizeArray(E[] array){
+		Random rgen = new Random();  // Random number generator			
+ 
+		for (int i=0; i<array.length; i++) {
+		    int randomPosition = rgen.nextInt(array.length);
+		    E temp = array[i];
+		    array[i] = array[randomPosition];
+		    array[randomPosition] = temp;
+		}
+ 
+		return array;
+	} //RandomizeArray
+	
+	/**
+	 * Removes Least Frequently Used element from the cache
+	 * @param fu FrequencyUsage object
+	 * @param cache map object of cache
+	 * @param cacheIndex cache index object
+	 * @return the removed polytree
+	 */
+	public static SmallGraph removeLFU(FrequencyUsage fu, Map<SmallGraph, SmallGraph> cache, 
+			Map<Set<Pair<Integer,Integer>>, Set<SmallGraph>> cacheIndex) {
+		SmallGraph lfuPolytree = fu.pollLeast();
+		cache.remove(lfuPolytree);
+		for(Set<SmallGraph> aSet : cacheIndex.values()) {
+			aSet.remove(lfuPolytree);
+		}
+		return lfuPolytree;
+	} //removeLFU
 } //class

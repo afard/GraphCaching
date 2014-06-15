@@ -17,6 +17,7 @@ import java.util.Set;
 import org.javatuples.Pair;
 
 import cache.CacheUtils;
+import cache.FrequencyUsage;
 
 public class TestHit2 {
 	
@@ -28,19 +29,24 @@ public class TestHit2 {
 	 * args[1] the path to the candidate base query graphs
 	 * args[2] the file for storing the statistical results
 	 * args[3] the path to the modified queries
-	 * args[4] the reverse of the original data graph if it is available
+	 * args[4] the number of queries which can be stored in the cache
+	 * args[5] the reverse of the original data graph if it is available
 	*/
 	public static void main(String[] args) throws Exception {
 		long startTime, stopTime;
 		double t_searchCache, t_storeCache;
-//		Map<SmallGraph, SmallGraph> cache = new HashMap<SmallGraph, SmallGraph>(); // the cache
+		Map<SmallGraph, SmallGraph> cache = new HashMap<SmallGraph, SmallGraph>(); // the cache
 		// the index on the ploytrees stored in the cache
 		Map<Set<Pair<Integer,Integer>>, Set<SmallGraph>> cacheIndex = new HashMap<Set<Pair<Integer,Integer>>, Set<SmallGraph>>();
-		Map<SmallGraph, String> polytree2query = new HashMap<SmallGraph, String>();
-
+		Map<SmallGraph, String> polytree2query = new HashMap<SmallGraph, String>(); // to keep the relation of polytrees in cache to entered queries
+		
+		// fuReplacement is an object for LFU replacement
+		int cacheSize = Integer.parseInt(args[4]);
+		FrequencyUsage fuReplacement = new FrequencyUsage(cacheSize);
+		
 		// reading the original data graph
 		Graph originalDataGraph = new Graph(args[0]);
-		if(args.length == 5)	originalDataGraph.buildParentIndex(args[4]);
+		if(args.length == 6)	originalDataGraph.buildParentIndex(args[5]);
 
 		// reading all base query graphs and store them in the cache those which cannot be answered by previous ones
 		File dirG = new File(args[1]);
@@ -54,16 +60,26 @@ public class TestHit2 {
 		if (!file.exists()) file.createNewFile();
 		FileWriter fw = new FileWriter(file.getAbsoluteFile());			
 		BufferedWriter bw = new BufferedWriter(fw);	
+		
+		// writing the name of removed queries into file
+		File file_r = new File(args[2] + "_removed");
+		// if file does not exists, then create it
+		if (!file_r.exists()) file_r.createNewFile();
+		FileWriter fw_r = new FileWriter(file_r.getAbsoluteFile());			
+		BufferedWriter bw_r = new BufferedWriter(fw_r);	
 
-		bw.write("queryName\t querySize\t isPolytree\t nHitCandidates\t t_searchCache\t isHit\t hitQueryName\t t_storeCache\n");
+		int queryOrder = 1;
+		bw.write("queryOrder\t queryName\t querySize\t isPolytree\t nHitCandidates\t t_searchCache\t isHit\t hitQueryName\t t_storeCache\n");
 		StringBuilder fileContents = new StringBuilder();
 		
+		//********************************************************************
 		System.out.println("Processing base queries");
 		for(File qFile : graphFiles) { // reading the base query graphs
 			System.out.print("Processing " + qFile.getName() + ":\t");
 			SmallGraph q = new SmallGraph(qFile.getAbsolutePath());
 			
-			fileContents.append(qFile.getName() + "\t" + q.getNumVertices() + "\t");
+			fileContents.append(queryOrder + "\t" + qFile.getName() + "\t" + q.getNumVertices() + "\t");
+			queryOrder ++;
 			
 			int queryStatus = q.isPolytree();
 			switch (queryStatus) {
@@ -94,6 +110,8 @@ public class TestHit2 {
 				if(CacheUtils.isDualCoverMatch(q, candidate)) {
 					notInCache = false;
 					System.out.print("Hit the cache!, ");
+					// increasing the frequency counter of the polytree
+					fuReplacement.addEntry(candidate);
 
 					hitQueryName = polytree2query.get(candidate);
 					// use the cache content to answer the query (not the goal of this test)
@@ -125,6 +143,15 @@ public class TestHit2 {
 				// The induced subgraph of the dualSimSet is found
 				// The <polytree, inducedSubgraph> is stored in the cache
 //				cache.put(polytree, inducedSubgraph);
+				if(cache.size() >= cacheSize) {
+					SmallGraph removedP = CacheUtils.removeLFU(fuReplacement, cache, cacheIndex);
+					bw_r.write(polytree2query.get(removedP) + "\t");
+					polytree2query.remove(removedP);
+				}//if
+				cache.put(polytree, new SmallGraph()); // a fake cache just to measure hit-rate
+				// adding the polytree to replacement object
+				fuReplacement.addEntry(polytree);
+				// adding the polytree to cacheIndex
 				Set<Pair<Integer, Integer>> sig = polytree.getSignature(); 
 				if (cacheIndex.get(sig) == null) {
 					Set<SmallGraph> pltSet = new HashSet<SmallGraph>();
@@ -156,13 +183,15 @@ public class TestHit2 {
 		}
 		File[] mgraphFiles = dirGM.listFiles();
 
+		mgraphFiles = CacheUtils.RandomizeArray(mgraphFiles);
 		
 		System.out.println("Processing the modified queries");
 		for(File qFile : mgraphFiles) { // reading the modified query graphs
 			System.out.print("Processing " + qFile.getName() + ":\t");
 			SmallGraph q = new SmallGraph(qFile.getAbsolutePath());
 			
-			fileContents.append(qFile.getName() + "\t" + q.getNumVertices() + "\t");
+			fileContents.append(queryOrder + "\t" + qFile.getName() + "\t" + q.getNumVertices() + "\t");
+			queryOrder ++;
 			
 			int queryStatus = q.isPolytree();
 			switch (queryStatus) {
@@ -193,6 +222,8 @@ public class TestHit2 {
 				if(CacheUtils.isDualCoverMatch(q, candidate)) {
 					notInCache = false;
 					System.out.print("Hit the cache!, ");
+					// increasing the frequency counter of the polytree
+					fuReplacement.addEntry(candidate);
 
 					hitQueryName = polytree2query.get(candidate);
 					// use the cache content to answer the query (not the goal of this test)
@@ -224,6 +255,15 @@ public class TestHit2 {
 				// The induced subgraph of the dualSimSet is found
 				// The <polytree, inducedSubgraph> is stored in the cache
 //				cache.put(polytree, inducedSubgraph);
+				if(cache.size() >= cacheSize) {
+					SmallGraph removedP = CacheUtils.removeLFU(fuReplacement, cache, cacheIndex);					
+					bw_r.write(polytree2query.get(removedP) + "\t");
+					polytree2query.remove(removedP);
+				}//if
+				cache.put(polytree, new SmallGraph()); // a fake cache just to measure hit-rate
+				// adding the polytree to replacement object
+				fuReplacement.addEntry(polytree);
+				// adding the polytree to cacheIndex
 				Set<Pair<Integer, Integer>> sig = polytree.getSignature(); 
 				if (cacheIndex.get(sig) == null) {
 					Set<SmallGraph> pltSet = new HashSet<SmallGraph>();
@@ -245,8 +285,9 @@ public class TestHit2 {
 
 		bw.close();
 		
-		System.out.println("Number of signatures stored: " + cacheIndex.size());
-		System.out.println("Number of polytrees stored: " + polytree2query.size());
+		System.out.println("Number of signatures in the cache: " + cacheIndex.size());
+		System.out.println("Number of polytrees in the cache: " + polytree2query.size());
+		bw_r.write("\nNumber of signatures in the cache: " + cacheIndex.size() + "\nNumber of polytrees in the cache: " + polytree2query.size());
 		int maxSet = 0;
 		for(Set<SmallGraph> pt : cacheIndex.values()) {
 			int theSize = pt.size();
@@ -254,6 +295,8 @@ public class TestHit2 {
 				maxSet = theSize;
 		} //for
 		System.out.println("The maximum number of stored polytrees with the same signature: " + maxSet);
+		bw_r.write("\nThe maximum number of stored polytrees with the same signature: " + maxSet);
+		bw_r.close();
 	} // main
 	
 } //class

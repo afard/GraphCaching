@@ -3,7 +3,11 @@ package graph.query;
 import graph.common.SmallGraph;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
+
+import org.javatuples.Pair;
 
 public class OldQtoNewQ {
 	
@@ -38,10 +42,14 @@ public class OldQtoNewQ {
 				for(int count2 = 0; count2 < qPerInc; count2++) {
 					int newQ_N = newQ.getNumVertices();
 					int newLabel = newQ.getLabel(randLabel.nextInt(newQ_N));
-					int connectVertex = randVertex.nextInt(newQ_N);
-					int edgeDirection = randEdgeDirection.nextInt(1);
+					int nConnections = 0;
+					while(nConnections == 0)
+						nConnections = randVertex.nextInt(newQ_N);
+					Set<Pair<Integer, Integer>> connectVertices = new HashSet<Pair<Integer, Integer>>(nConnections);
+					for(int i=0; i < nConnections; i++)
+						connectVertices.add(new Pair<Integer, Integer>(randVertex.nextInt(newQ_N), randEdgeDirection.nextInt(2)));
 
-					newQ.connectNewVertex(newQ_N , newLabel, connectVertex, edgeDirection);
+					newQ.connectNewVertex(newQ_N , newLabel, connectVertices);
 					newQ.print2File(args[3] + "/" + inG.getName() + "-V" + version);
 					version ++;
 				} //for

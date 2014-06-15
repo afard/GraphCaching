@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 
 import org.javatuples.Pair;
@@ -129,8 +130,10 @@ public class SmallGraph {
 	 */
 	public SmallGraph clone() {
 		SmallGraph copyGraph = new SmallGraph(this.getNumVertices());
-		copyGraph.vertices.putAll(this.vertices);
 		copyGraph.labels.putAll(this.labels);
+		for(int u : labels.keySet()) {
+			copyGraph.vertices.put(u, new HashSet<Integer>(this.post(u)));
+		} //for
 		
 		return copyGraph;
 	} //clone
@@ -203,7 +206,7 @@ public class SmallGraph {
             qu.clear();	// clearing the queue
             qu.add(i); // putting vertex i in the queue
             visit.put(i, true); // mark as visited
-            while (! qu.isEmpty()) visit(); // visit vertices in BFS order
+            while (! qu.isEmpty()) traverse(); // visit vertices in BFS order
             int max = len_max - 1;
             for(int l : len.keySet()) {
             	int length = len.get(l);
@@ -218,7 +221,7 @@ public class SmallGraph {
      * Visit the next vertex (at the head of queue 'qu'), mark it, compute the
      *  path-length 'len' for each of its children and put them in the queue. 
      */
-    private void visit() {    	
+    private void traverse() {    	
         int j = qu.poll(); 							// take next vertex from queue
         len_max = len.get(j) + 1;    			  	// path-length to child vertices
         // the underlying undirected graph should be used
@@ -465,48 +468,50 @@ public class SmallGraph {
 	} // getPolytree
 
 	/**
-	 * Connect a new vertex to one of the vertices of the graph
+	 * Connect a new vertex to a set of the vertices of the graph
 	 * @param newVertex the id number of the new vertex
 	 * @param newLabel  the label of the new vertex
-	 * @param oldVertex the id number of the old vertex
-	 * @param edgeDirection 0 means an edge from newVertex to oldVertex, opposite otherwise
+	 * @param connectVertices a set of pairs. The first integer of each pair is the id number of an old vertex.
+	 * The second integer is the edgeDirection; 0 means an edge from newVertex to oldVertex, opposite otherwise
 	 */
-	public void connectNewVertex(int newVertex, int newLabel, int oldVertex, int edgeDirection) {
+	public void connectNewVertex(int newVertex, int newLabel, Set<Pair<Integer, Integer>> connectVertices) {
 		if(this.vertices.get(newVertex) != null) {
 			System.out.println("The vertex is already in the graph");
 			System.exit(-1);
-		} //if
-		
-		if(edgeDirection == 0) { //from newVertex to oldVertex
-			Set<Integer> vSet = new HashSet<Integer>();
-			vSet.add(oldVertex);
-			vertices.put(newVertex, vSet);
-			labels.put(newVertex, newLabel);
-			if(parentIndex != null) {
-				if(parentIndex.get(oldVertex) != null)
-					parentIndex.get(oldVertex).add(newVertex);
-				else {
-					Set<Integer> pSet = new HashSet<Integer>();
-					pSet.add(newVertex);
-					parentIndex.put(oldVertex, pSet);
-				}
-			}//if
-		} else { //from oldVertex to newVertex
-			if(vertices.get(oldVertex) == null) {
-				Set<Integer> vSet = new HashSet<Integer>();
-				vSet.add(newVertex);
-				vertices.put(oldVertex, vSet);
-			} else
-				vertices.get(oldVertex).add(newVertex);
+		} //if		
 			
-			labels.put(newVertex, newLabel);
-			if(parentIndex != null) {
-				Set<Integer> pSet = new HashSet<Integer>();
-				pSet.add(oldVertex);
-				parentIndex.put(newVertex, pSet);
-			} //if				
-		}//if-else
+		labels.put(newVertex, newLabel);
+		vertices.put(newVertex, new HashSet<Integer>());
+		
+		for(Pair<Integer, Integer> connectVertex : connectVertices) {
+			int oldVertex = connectVertex.getValue0();
+			if(connectVertex.getValue1() == 0) { //from newVertex to oldVertex
+				vertices.get(newVertex).add(oldVertex);
+				if(parentIndex != null) {
+					if(parentIndex.get(oldVertex) != null)
+						parentIndex.get(oldVertex).add(newVertex);
+					else {
+						Set<Integer> pSet = new HashSet<Integer>();
+						pSet.add(newVertex);
+						parentIndex.put(oldVertex, pSet);
+					}
+				}//if
+			} else { //from oldVertex to newVertex
+				if(vertices.get(oldVertex) == null) {
+					Set<Integer> vSet = new HashSet<Integer>();
+					vSet.add(newVertex);
+					vertices.put(oldVertex, vSet);
+				} else
+					vertices.get(oldVertex).add(newVertex);
 
+				if(parentIndex != null) {
+					Set<Integer> pSet = new HashSet<Integer>();
+					pSet.add(oldVertex);
+					parentIndex.put(newVertex, pSet);
+				} //if				
+			}//if-else
+		} //for
+		
 		if(labelIndex != null) {
 			if(labelIndex.get(newLabel) != null)
 				labelIndex.get(newLabel).add(newVertex);
@@ -582,7 +587,7 @@ public class SmallGraph {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		SmallGraph q = new SmallGraph("exampleGraphs/40_1.2a_query.txt");
+		SmallGraph q = new SmallGraph("/home/arash/cache/Tests/queryN20D4_143.txt");
 		System.out.println("The center: " + q.getSelectedCenter());
 		int queryStatus = q.isPolytree();
 		switch (queryStatus) {
@@ -599,6 +604,31 @@ public class SmallGraph {
 		}
 		
 		System.out.println(q);
+		System.out.println("##########################");
+		SmallGraph qNew = q.clone();
+		System.out.println("Adding a new vertex:");
+		Random randLabel = new Random();
+		Random randVertex = new Random();
+		Random randEdgeDirection = new Random();
+
+		for(int count=0; count<5; count++) {
+			int q_N = q.getNumVertices();
+			int newLabel = q.getLabel(randLabel.nextInt(q_N));
+			int nConnections = 0;
+			while(nConnections == 0)
+				nConnections = randVertex.nextInt(q_N);
+			Set<Pair<Integer, Integer>> connectVertices = new HashSet<Pair<Integer, Integer>>(nConnections);
+			for(int i=0; i < nConnections; i++)
+				connectVertices.add(new Pair<Integer, Integer>(randVertex.nextInt(q_N), randEdgeDirection.nextInt(2)));
+
+			q.connectNewVertex(q_N , newLabel, connectVertices);
+		}
+		System.out.println(q);
+		System.out.println("##########################");
+		System.out.println(qNew);
+		
+		
+//		q.print2File("/home/arash/cache/Tests/test.txt");
 
 	} //main
 	

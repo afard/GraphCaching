@@ -28,6 +28,12 @@ public class Ball extends SmallGraph {
 	public Ball() {
 	}
 	
+	public Ball(int nVertices) {
+		super(nVertices);
+		nodesInBall = new HashSet<Integer>();
+		borderNodes = new HashSet<Integer>();		
+	}
+	
 	/**************************************************************
 	 * Constructor for creating the ball when the data graph , center of the ball, and radius are passed.
 	 *  
@@ -83,6 +89,19 @@ public class Ball extends SmallGraph {
 		this.labels = subgraph.labels;
 		
 	} // Ball
+	
+	public Ball clone() {
+		Ball copyBall = new Ball(this.getNumVertices());
+		copyBall.vertices.putAll(this.vertices);
+		copyBall.labels.putAll(this.labels);
+//		copyBall.parentIndex.putAll(this.parentIndex);
+		copyBall.nodesInBall.addAll(this.nodesInBall);
+		copyBall.borderNodes.addAll(this.borderNodes);
+		copyBall.ballCenter = this.ballCenter;
+		copyBall.ballRadius = this.ballRadius;
+		
+		return copyBall;
+	}
 	
 	public void clear() {
 		this.vertices.clear();
