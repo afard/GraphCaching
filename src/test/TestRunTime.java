@@ -16,18 +16,19 @@ import java.util.Set;
 
 import cache.CacheUtils;
 
-public class TestCaseC {
+public class TestRunTime {
 
 	/*
 	 * Running a set of queries against a data graph, and storing the performance results in file readable by Excel program
 	 * args[0] is the dataGraph file
 	 * args[1] is the path to the folder of queries
 	 * args[2] is the output file
-	 * args[3] a number to assign limit for the number of balls    
-	 * args[4] the reverse data graph if it is available 
+	 * args[3] a number to assign limit for the number of balls (0 means no limit)
+	 * args[4] the number of queries to test among the available queries
+	 * args[5] the reverse data graph if it is available 
 	 */
 	public static void main(String[] args) throws Exception {
-		if(args.length < 4) {
+		if(args.length < 5) {
 			System.out.println("Not correct number of input arguments");
 			System.exit(-1);
 		}
@@ -36,7 +37,7 @@ public class TestCaseC {
 		
 		startTime = System.nanoTime();
 		Graph dataGraph = new Graph(args[0]);
-		if(args.length == 5)	dataGraph.buildParentIndex(args[4]);
+		if(args.length == 6)	dataGraph.buildParentIndex(args[5]);
 		stopTime = System.nanoTime();
 		System.out.println("Spent time to load the data graph: " + (double)(stopTime - startTime)/1000000 + " ms");
 		
@@ -61,8 +62,16 @@ public class TestCaseC {
 			bw.close();
 			throw new Exception("No query files found in the directory");
 		}
+		queries = CacheUtils.RandomizeArray(queries); // shuffling the array of the queries
+		int nQtest = Integer.parseInt(args[4]); // the number of queries to test among the available queries
+		if(nQtest <= 0) {
+			bw.close();
+			throw new Exception("the number of 'queries to test' should be a positive integer");
+		}
+		if(nQtest > queries.length) nQtest = queries.length;
 
-		for(File query : queries) {
+		for(int qNo=0; qNo < nQtest; qNo++) {
+			File query = queries[qNo];
 			System.out.println("Processing " + query.getAbsolutePath());
 			System.out.println("_______________________________________________");
 			
@@ -94,6 +103,7 @@ public class TestCaseC {
 
 			// The tight simulation is performed and its time, t_noCache, is measured			
 			startTime = System.nanoTime();
+//			Set<Ball> tightResults = TightSimulation.getTightSimulation(dataGraph, queryGraph);
 			Set<Ball> tightResults = TightSimulation.getNewTightSimulation(dataGraph, queryGraph, limit, fileContents);
 			TightSimulation.filterMatchGraphs(tightResults);
 			stopTime = System.nanoTime();
@@ -169,7 +179,7 @@ public class TestCaseC {
 				fileContents.append(ratio1 + "\t");
 //			} else
 //				fileContents.append("-1\t -1\t -1\t");
-			
+/*			
 			// (2) ******************************************************************************************
 			// Creating balls of polytree and assuming that they are stored in the catch
 			startTime = System.nanoTime();
@@ -181,7 +191,7 @@ public class TestCaseC {
 			
 			startTime = System.nanoTime();
 			Set<Ball> resultFromBalls = CacheUtils.tightSimBalls(cacheBalls, queryGraph, limit);
-			TightSimulation.filterMatchGraphs(resultFromBalls);
+			resultFromBalls = TightSimulation.filterMatchGraphs(resultFromBalls);
 			stopTime = System.nanoTime();
 			long t_wcacheBalls = stopTime - startTime;
 			System.out.println("(2) The total time of tight simulation with cache, 't_wcacheBalls': " + (double)t_wcacheBalls/1000000 + " ms");
@@ -198,9 +208,10 @@ public class TestCaseC {
 			System.out.println("************ (2) The ratio ***************");
 			double ratio2 = (double)t_noCache / (double)t_wcacheBalls;
 			System.out.println("(2) t_noCache / t_wcacheBalls (using extracted balls)= " + ratio2);
-			fileContents.append(ratio2 + "\n");
-			
+			fileContents.append(ratio2);
+*/			
 			// ******************************************************************************************
+		    fileContents.append("\n");
 			bw.write(fileContents.toString());
 			fileContents.delete(0, fileContents.length());
 			System.out.println("_______________________________________________");

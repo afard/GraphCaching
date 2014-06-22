@@ -46,7 +46,9 @@ public class SmallGraph {
      */
     public SmallGraph() {
     	// It is used when the number of vertices is not known in advance
-    }
+    	vertices = new HashMap<Integer, Set<Integer>>();
+    	labels = new HashMap<Integer, Integer>();    	
+   }
     
     /**
      * Constructor
@@ -551,7 +553,9 @@ public class SmallGraph {
 			result.append(u); // the vertex id
 			result.append(" " + labels.get(u)); // the vertex label
 			if(vertices.containsKey(u)) {	// the vertex neighbors
-				List<Integer> vList = new ArrayList<Integer>(vertices.get(u));
+				List<Integer> vList = new ArrayList<Integer>(this.post(u));
+				if(vList.contains(null))
+					System.err.println("Null among the neighbors");
 				Collections.sort(vList);
 				for(int v : vList) { 
 					result.append(" " + v);

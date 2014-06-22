@@ -137,7 +137,7 @@ public class TightSimulation {
 	 * @param query - The Query graph.
 	 * @return All the subgraphs; i.e., the set of balls in this case
 	 */
-	public static Set<Ball> getNewTightSimulationModified(Graph dataGraph, SmallGraph query, int limit, StringBuilder notes) {
+	public static Set<Ball> getNewTightSimulation(Graph dataGraph, SmallGraph query, int limit, StringBuilder notes) {
 		long startTime, stopTime;
 		Set<Ball> resultBalls = new HashSet<Ball>();
 		
@@ -168,10 +168,6 @@ public class TightSimulation {
 		Set<Integer> matchCenters = dualSimSet.get(qCenter);
 		System.out.println("- INSIDE getTightSimulation()- the number of match vertices: " + matchCenters.size());
 		notes.append(matchCenters.size() + "\t");
-//		if(matchCenters.size() > limit) { // not processing when it is likely very time consuming
-//			System.out.println("- INSIDE getTightSimulation()- skip over " + limit);
-//			return resultBalls;
-//		}
 		
 		// ********** FINDING THE MATCH GRAPH STEP **************//
 		startTime = System.currentTimeMillis();
@@ -185,7 +181,7 @@ public class TightSimulation {
 		for(int center : matchCenters){
 			Ball ball = new Ball(newGraph, center, qRadius); // BALL CREATION
 			// ******** DUAL FILTER STEP  **********
-			boolean found = ball.dualFilter(query, dualSimSet);
+			boolean found = ball.newDualFilter(query, dualSimSet);
 			if(found) {
 				resultBalls.add(ball);
 				if(resultBalls.size() == limit) break; // it will never happen when limit=0, so finds all the results
@@ -211,48 +207,29 @@ public class TightSimulation {
 		Set<Ball> resultBalls = new HashSet<Ball>();
 		
 		//********** FINDING THE "DUAL SIMULATION" STEP ********** //
-//		startTime = System.currentTimeMillis();
 		Map<Integer,Set<Integer>> dualSimSet = DualSimulation.getNewDualSimSet(dataGraph, query);
-//		stopTime = System.currentTimeMillis();
-//		System.out.println("- INSIDE getTightSimulation()- time for dualSimSet: " + (stopTime - startTime) + " ms");
 		if(dualSimSet.isEmpty()){
-//			System.out.println("No Dual Match"); 
 			return resultBalls;
 		}
 		
-		// ********** finding the number of vertices in the dualSimSet **************//
-		// *** This step is not a part of the algorithm, and is done only for extracting information
-//		startTime = System.currentTimeMillis();
-//		Set<Integer> nVdualSimSet = DualSimulation.nodesInSimSet(dualSimSet);
-//		stopTime = System.currentTimeMillis();
-//		System.out.println("- INSIDE getTightSimulation()- the number of vertices in the dualSimSet: " + nVdualSimSet.size());
-//		System.out.println("- INSIDE getTightSimulation()- the time for this extra step: " + (stopTime - startTime) + " ms");
-
 		// ********** FINDING QUERY Radius and selected center ********** //
 		int qRadius = query.getRadius();
 		int qCenter = query.getSelectedCenter();
 		Set<Integer> matchCenters = dualSimSet.get(qCenter);
-//		System.out.println("- INSIDE getTightSimulation()- the number of match vertices: " + matchCenters.size());
 		
 		// ********** FINDING THE MATCH GRAPH STEP **************//
-//		startTime = System.currentTimeMillis();
 		SmallGraph newGraph = DualSimulation.getResultMatchGraph(dataGraph, query, dualSimSet);	
-//		stopTime = System.currentTimeMillis();
-//		System.out.println("- INSIDE getTightSimulation()- time for dualMatchGraph: " + (stopTime - startTime) + " ms");
 		
 		// ****** BALL CREATION STEP ********* //
-//		startTime = System.currentTimeMillis();
 		for(int center : matchCenters){
 			Ball ball = new Ball(newGraph, center, qRadius); // BALL CREATION
 			// ******** DUAL FILTER STEP  **********
-			boolean found = ball.dualFilter(query, dualSimSet);
+			boolean found = ball.newDualFilter(query, dualSimSet);
 			if(found) {
 				resultBalls.add(ball);
 				if(resultBalls.size() == limit) break;
 			}
 		} //for
-//		stopTime = System.currentTimeMillis();
-//		System.out.println("- INSIDE getTightSimulation()- time for ball creation and filtering: " + (stopTime - startTime) + " ms");
 
 		return resultBalls;
 	} //getNewTightSimulation
@@ -296,29 +273,24 @@ public class TightSimulation {
 
 	/********************************************************************************
 	 * This method filters any ball which is superset of any other ball
-	 * @param matchGraphs the result of tight simulation in the center->ball format
-	 * @return filtered set of results
+	 * @param matchGraphs the result of tight simulation in the center->ball format which will be filtered
 	 */
-	public static Set<Ball> filterMatchGraphs(Set<Ball> matchGraphs) {
-		Set<Ball> filteredGraphs = new HashSet<Ball>();
+	public static void filterMatchGraphs(Set<Ball> matchGraphs) {
 		
 		Iterator<Ball> it = matchGraphs.iterator();
 		while(it.hasNext()) {
 			Ball theBall = it.next();
-			it.remove();
-			matchGraphs.remove(it);
-			boolean good = true;
-			for(Ball aBall : matchGraphs) {
+			Set<Ball> tempBalls = new HashSet<Ball>(matchGraphs);
+			tempBalls.remove(theBall); // not comparing theBall with itself
+			for(Ball aBall : tempBalls) {
 				if(theBall.contains(aBall)) {
-					good = false;
+					it.remove();
+					matchGraphs.remove(it);
 					break;
 				}
 			} //for
-			if(good)
-				filteredGraphs.add(theBall);
 		} //while
-		return filteredGraphs;
-	}
+	}//filterMatchGraphs
 
 	/*************************************************************************************************
 	 * A method to print the match centers. Just for debugging purposes. 
@@ -349,9 +321,9 @@ public class TightSimulation {
 		
 		System.out.println("Result of tight simulation after post-processing:");
 		startTime = System.currentTimeMillis();
-		Set<Ball> filteredTightSim = filterMatchGraphs(tightSim);
+		filterMatchGraphs(tightSim);
 		stopTime = System.currentTimeMillis();
-		printMatch(filteredTightSim);
+		printMatch(tightSim);
 		System.out.println("Spent time: " + (stopTime - startTime) + "ms");
 	} //main
 

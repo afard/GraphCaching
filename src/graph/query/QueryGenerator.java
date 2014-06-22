@@ -73,11 +73,12 @@ public class QueryGenerator {
 		} //for
 		
 		for(int indexG : g.labels.keySet()) {
+			int indexQ = vMap.get(indexG);
+			q.vertices.put(indexQ, new HashSet<Integer>());
 			if(g.post(indexG) != null) {
-				int indexQ = vMap.get(indexG);
-				q.vertices.put(indexQ, new HashSet<Integer>());
 				for(int child : g.post(indexG)) {
-					q.vertices.get(indexQ).add(vMap.get(child));
+					if(vMap.containsKey(child)) // Any child without a label in labels map will be discarded 
+						q.vertices.get(indexQ).add(vMap.get(child));
 				} // for
 			} //if
 		} //for

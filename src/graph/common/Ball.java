@@ -156,7 +156,44 @@ public class Ball extends SmallGraph {
     	}
     	
     	// filtered dualsim on the ball
-//    	localDualSim = DualSimulation.dualSimSetHelper(this, query, localDualSim);
+    	localDualSim = DualSimulation.dualSimSetHelper(this, query, localDualSim);
+//    	localDualSim = DualSimulation.newDualSimSetHelper(this, query, localDualSim);
+    	if(localDualSim.isEmpty()) {
+    		this.clear();
+    		return false;
+    	} //if
+    	// it is valid only if it still contains the center
+    	this.nodesInBall.clear();
+    	this.borderNodes.clear();
+    	nodesInBall.addAll(DualSimulation.nodesInSimSet(localDualSim));
+    	if(! nodesInBall.contains(ballCenter) ) {
+    		this.clear();
+    		return false;
+    	} //if
+
+        // Finding max perfect subgraph
+    	SmallGraph maxPG = DualSimulation.getResultMatchGraph(this, query, localDualSim);
+    	this.vertices = maxPG.vertices;
+    	this.labels = maxPG.labels;
+    	
+    	return true;
+    } //dualFilter
+    
+    /** Perform new-dual simulation on this ball.
+     *  @param query  	the query graph Q(U, D, k)
+     *  @param dualSim  mappings from a query vertex u_q to { graph vertices v_g }
+     *  @return			returns false when the ball becomes empty; true otherwise
+     */ 
+    public boolean newDualFilter (SmallGraph query, Map<Integer, Set<Integer>> dualsim) {
+    	// making a copy of dualsim and keeping only the vertices of the ball
+    	Map<Integer, Set<Integer>> localDualSim = new HashMap<Integer, Set<Integer>>(dualsim.size());
+    	for(int u : dualsim.keySet()) {
+    		Set<Integer> localMatch = new HashSet<Integer>(nodesInBall);
+    		localMatch.retainAll(dualsim.get(u));
+    		localDualSim.put(u, localMatch);
+    	}
+    	
+    	// filtered dualsim on the ball
     	localDualSim = DualSimulation.newDualSimSetHelper(this, query, localDualSim);
     	if(localDualSim.isEmpty()) {
     		this.clear();

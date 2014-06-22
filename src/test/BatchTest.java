@@ -74,7 +74,7 @@ public class BatchTest {
 				// The tight simulation is performed and its time, t_noCache, is measured
 				startTime = System.currentTimeMillis();
 				Set<Ball> tightResults = TightSimulation.getTightSimulation(dataGraph, queryGraph);
-				tightResults = TightSimulation.filterMatchGraphs(tightResults);
+				TightSimulation.filterMatchGraphs(tightResults);
 				stopTime = System.currentTimeMillis();
 				long t_noCache = stopTime - startTime;
 				System.out.println("The total time of tight simulation without cache, 't_noCache': " + t_noCache + " ms");
@@ -165,7 +165,7 @@ public class BatchTest {
 								long bTime = System.currentTimeMillis();
 								SmallGraph inducedSubgraph = cache.get(candidate);
 								Set<Ball> tightResults_cache = TightSimulation.getTightSimulation(inducedSubgraph, queryGraph);
-								tightResults_cache = TightSimulation.filterMatchGraphs(tightResults_cache);
+								TightSimulation.filterMatchGraphs(tightResults_cache);
 								long fTime = System.currentTimeMillis();
 								System.out.println("The time for tight simulation from cache: " + (fTime - bTime) + " ms");
 							} //if
@@ -175,7 +175,7 @@ public class BatchTest {
 						System.out.println("Not in the cache!");
 						long bTime = System.currentTimeMillis();
 						Set<Ball> tightResults_cache = TightSimulation.getTightSimulation(dataGraph, queryGraph);
-						tightResults_cache = TightSimulation.filterMatchGraphs(tightResults_cache);
+						TightSimulation.filterMatchGraphs(tightResults_cache);
 						long fTime = System.currentTimeMillis();
 						System.out.println("The time for tight simulation without cache: " + (fTime - bTime) + " ms");
 					} //if

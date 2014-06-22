@@ -64,7 +64,7 @@ public class TestCaseA {
 		System.out.println("Spent time for tight simulation without post processing: " + pre_t_noCache + " ms");
 		
 		startTime = System.currentTimeMillis();
-		tightResults = TightSimulation.filterMatchGraphs(tightResults);
+		TightSimulation.filterMatchGraphs(tightResults);
 		stopTime = System.currentTimeMillis();
 		long post_t_noCache = stopTime - startTime;
 		System.out.println("Spent time for post processing: " + post_t_noCache + " ms");
@@ -127,7 +127,7 @@ public class TestCaseA {
 		System.out.println("Spent time for tight simulation from cache without post processing: " + pre_t_withCache + " ms");
 		
 		startTime = System.currentTimeMillis();
-		tightResults_cache = TightSimulation.filterMatchGraphs(tightResults_cache);
+		TightSimulation.filterMatchGraphs(tightResults_cache);
 		stopTime = System.currentTimeMillis();
 		long post_t_withCache = stopTime - startTime;
 		System.out.println("Spent time for post processing: " + post_t_withCache + " ms");
