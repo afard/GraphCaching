@@ -7,6 +7,11 @@ import java.util.Map;
 import java.util.Random;
 
 import graph.common.*;
+/**
+ * 
+ * @author Arash Fard
+ *
+ */
 
 public class QueryGenerator {
 	/*

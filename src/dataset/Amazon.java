@@ -13,7 +13,8 @@ import java.util.Map;
 import java.util.Set;
 
 /*
- * Reading Citation dataset and creating a compatible data graph
+ * Reading Amazon dataset and creating a compatible data graph
+ * The dataset from http://snap.stanford.edu/data/amazon-meta.html
  */
 public class Amazon {
 	private final static int CATEGORY_DEPTH = 3;

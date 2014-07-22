@@ -181,7 +181,6 @@ public class GraphUtils {
 	 */
 	public static void storeInverseGraph(Graph g, String fileName) throws Exception {
 		System.out.println("Making the reverse graph");
-//		g.label = null; // release memory
 		g.buildParentIndex();
 		
 		System.out.println("Writing the reverse graph");		
@@ -193,10 +192,8 @@ public class GraphUtils {
 		
 		StringBuilder reverseGraph = new StringBuilder();
 		int nVertices = g.getNumVertices();
-//		g.adj = null; // release memory
 		for(int u=0; u < nVertices; u++) {
 			reverseGraph.append(u);		// the id of the vertex
-//			reverseGraph.append(" " + g.getLabel(u)); // the label of the vertex
 			reverseGraph.append(" 0");
 			if(g.pre(u) != null)
 				for(int v : g.pre(u)) {		// the parents of the vertex now becomes its children
@@ -210,6 +207,12 @@ public class GraphUtils {
 		bw.close();
 	}
 	
+	/**
+	 * Makes the vertex continuous starting from 0 
+	 * @param inputFile the input file of the graph (adjacency list) that its vertex IDs should be arranged
+	 * @param outputFile the name of the output file with arranged vertex IDs
+	 * @throws Exception
+	 */
 	public static void arrangeVertexID (String inputFile, String outputFile) throws Exception {
 		System.out.println("Reading the input graph");
 		Graph inG = new Graph(inputFile);

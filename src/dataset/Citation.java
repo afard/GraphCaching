@@ -12,6 +12,7 @@ import java.util.Set;
 
 /*
  * Reading Citation dataset and creating a compatible data graph
+ * The dataset from http://arnetminer.org/citation
  */
 public class Citation {
 

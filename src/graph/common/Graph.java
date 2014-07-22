@@ -26,7 +26,6 @@ public class Graph {
 	private int[][] parent = null; // it remains null by default
 	private Set<Integer>[] parentIndex = null; // it remains null by default
 
-//	private Set<Integer>[] childIndex = null; // it will be filled gradually
 
 	/*************************************************************
 	 * Auxiliary constructor
@@ -73,7 +72,6 @@ public class Graph {
 
 			// initialize the main array (the vertex id starts from 0)   
 			this.adj = new int[++max][];
-//			this.childIndex = (Set<Integer>[]) new Set<?>[max];
 			this.label = new int[max];
 			System.out.println("Number of vertices in " + filePath + ": " + max);
 
@@ -241,24 +239,15 @@ public class Graph {
 	 * @param id Id of the vertex
 	 * @return Set<Inetegr> The Set of outgoing edges from the given vertex
 	 */
-//	@SuppressWarnings("unchecked")
 	public Set<Integer> post(int id) {
 		if (id > adj.length -1) // the first id is 0
 			return null;
 		if (adj[id] == null)
 			return new HashSet<Integer>();
 
-//		if (this.childIndex == null)
-//			childIndex = (Set<Integer>[]) new Set<?>[adj.length];
-//		
-//		if (this.childIndex[id] == null) {
 			Set<Integer> children = new HashSet<Integer>(adj[id].length);
 			for (int i = 0; i < adj[id].length; i++)
 				children.add(adj[id][i]);
-//			this.childIndex[id] = children;
-//		}
-//
-//		return this.childIndex[id];
 			return children;
 	}
 

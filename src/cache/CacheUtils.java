@@ -3,8 +3,6 @@ package cache;
 import graph.common.Ball;
 import graph.common.SmallGraph;
 import graph.simulation.DualSimulation;
-import graph.simulation.TightSimulation;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
@@ -38,8 +36,8 @@ public class CacheUtils {
 	
 	/**
 	 * Returns the set of labels in a graph signature
-	 * @param sig
-	 * @return
+	 * @param sig a graph signature
+	 * @return the set of the labels in the given signature
 	 */
 	public static Set<Integer> getSigLabels(Set<Pair<Integer,Integer>> sig) {
 		Set<Integer> labels = new HashSet<Integer>();
@@ -52,8 +50,8 @@ public class CacheUtils {
 	
 	/**
 	 * Finds if the new query is a dual-cover-match to the polytree 
-	 * @param candidate
-	 * @param polytree
+	 * @param newQuery the new query graph from smallGraph class
+	 * @param polytree the polytree
 	 * @return true if it is dual-cover-match; false otherwise
 	 */
 	public static boolean isDualCoverMatch(SmallGraph newQuery, SmallGraph polytree) {
@@ -94,8 +92,9 @@ public class CacheUtils {
 	
 	/**
 	 * Given a set of balls and a query, it is looking for tight match inside each ball
-	 * @param balls
-	 * @param query
+	 * @param balls the set of balls
+	 * @param query the query
+	 * @param limit the maximum number of balls which will be considered
 	 * @return the set of balls which are are the result of tight match on the input balls
 	 */
 	public static Set<Ball> tightSimBalls(Set<Ball> balls, SmallGraph query, int limit) {
@@ -150,4 +149,5 @@ public class CacheUtils {
 		}
 		return lfuPolytree;
 	} //removeLFU
+	
 } //class

@@ -62,7 +62,7 @@ public class FrequencyUsage {
 	
 	/**
 	 * Returns the least frequently used polytree, and removes it from its fuMap
-	 * @return
+	 * @return Returns the least frequently used polytree, and removes it
 	 */
 	public SmallGraph pollLeast() {
 		fuMap_sorted = new TreeMap<SmallGraph, Long>(new ValueComparator(fuMap));

@@ -8,7 +8,7 @@ import java.io.File;
 import java.util.Random;
 /**
  * 
- * @author arash
+ * @author Arash Fard
  *
  */
 public class FavoritQueryGenerator {

@@ -8,6 +8,11 @@ import java.util.Random;
 import java.util.Set;
 
 import org.javatuples.Pair;
+/**
+ * 
+ * @author Arash Fard
+ *
+ */
 
 public class OldQtoNewQ {
 	

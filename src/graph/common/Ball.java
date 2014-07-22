@@ -28,6 +28,10 @@ public class Ball extends SmallGraph {
 	public Ball() {
 	}
 	
+	/**
+	 * Another constructor
+	 * @param nVertices number of vertices in the ball
+	 */
 	public Ball(int nVertices) {
 		super(nVertices);
 		nodesInBall = new HashSet<Integer>();
@@ -35,8 +39,10 @@ public class Ball extends SmallGraph {
 	}
 	
 	/**************************************************************
-	 * Constructor for creating the ball when the data graph , center of the ball, and radius are passed.
-	 *  
+	 * Constructor for creating the ball when the data graph, center of the ball, and radius are passed.
+	 * @param graph  the data graph which ball will be created on that
+	 * @param center the center of the ball, which must be one of the vertices of the graph
+	 * @param radius the radius of the ball
 	 */
 	public Ball(SmallGraph graph, int center, int radius){
 		ballCenter = center;
@@ -90,6 +96,9 @@ public class Ball extends SmallGraph {
 		
 	} // Ball
 	
+	/**
+	 * Makes a clone of this ball
+	 */
 	public Ball clone() {
 		Ball copyBall = new Ball(this.getNumVertices());
 		copyBall.vertices.putAll(this.vertices);
@@ -103,6 +112,9 @@ public class Ball extends SmallGraph {
 		return copyBall;
 	}
 	
+	/**
+	 * Clears this balls
+	 */
 	public void clear() {
 		this.vertices.clear();
 		this.labels.clear();
@@ -123,8 +135,9 @@ public class Ball extends SmallGraph {
     
     /** Perform dual simulation on this ball.
      *  @param query  	the query graph Q(U, D, k)
-     *  @param dualSim  mappings from a query vertex u_q to { graph vertices v_g }
+     *  @param dualsim  mappings from a query vertex u_q to { graph vertices v_g }
      *  @param strong	when it is false, we assume that ball is created based on the dual match result graph
+     *   (it is reserved for future if we want to implement strong)
      *  @return			returns false when the ball becomes empty; true otherwise
      */ 
     public boolean dualFilter (SmallGraph query, Map<Integer, Set<Integer>> dualsim, boolean strong) {
@@ -157,7 +170,6 @@ public class Ball extends SmallGraph {
     	
     	// filtered dualsim on the ball
     	localDualSim = DualSimulation.dualSimSetHelper(this, query, localDualSim);
-//    	localDualSim = DualSimulation.newDualSimSetHelper(this, query, localDualSim);
     	if(localDualSim.isEmpty()) {
     		this.clear();
     		return false;
@@ -181,7 +193,7 @@ public class Ball extends SmallGraph {
     
     /** Perform new-dual simulation on this ball.
      *  @param query  	the query graph Q(U, D, k)
-     *  @param dualSim  mappings from a query vertex u_q to { graph vertices v_g }
+     *  @param dualsim  mappings from a query vertex u_q to { graph vertices v_g }
      *  @return			returns false when the ball becomes empty; true otherwise
      */ 
     public boolean newDualFilter (SmallGraph query, Map<Integer, Set<Integer>> dualsim) {
@@ -253,6 +265,9 @@ public class Ball extends SmallGraph {
         return s.toString();
     } //getBallAsString
 	
+	/**
+	 * Another method to return string presentation of the ball
+	 */
 	public String toString() {
 		StringBuilder s = new StringBuilder("-----------\n");
 		s.append("Center: " + ballCenter + "\n");

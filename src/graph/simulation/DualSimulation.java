@@ -244,7 +244,7 @@ public class DualSimulation{
 			sim.put(u, phi);			
 		} //for
 		
-		dualCardinalityFilter(dataGraph, query, sim);
+//		dualCardinalityFilter(dataGraph, query, sim);
 		
 		// sim will be refined based on the dualSim condition
 		boolean alter = true;
@@ -385,7 +385,7 @@ public class DualSimulation{
 	 */
 	public static Map<Integer, Set<Integer>>  newDualSimSetHelper(SmallGraph dataGraph, SmallGraph query, Map<Integer, Set<Integer>> relation) {
 		// relation will be refined based on the dualSim condition
-		dualCardinalityFilter(dataGraph, query, relation);
+//		dualCardinalityFilter(dataGraph, query, relation);
 		boolean alter = true;
 		while (alter) {
 			alter = false;
